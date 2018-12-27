@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+
+<!--/////////////////////////////////////////////////////////////////////////////
+//
+//(c)2003-2018 ITS-I Inc. All Rights Reserved.
+//
+//THIS SOURCE FILE IS THE PROPERTY OF ITS-I Inc. AND IS NOT TO BE
+//RE-DISTRIBUTED BY ANY MEANS WHATSOEVER WITHOUT THE EXPRESSED
+//WRITTEN CONSENT OF ITS-I Inc.
+//
+//CONTACT INFORMATION:
+//support@its-i.co.kr
+//http://www.its-i.co.kr
+//
+/////////////////////////////////////////////////////////////////////////////-->
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+</head>
+
+<body>
+
+	<div class="row" layout:fragment="mainContent">
+		<div class="middle-box text-center loginscreen animated fadeInDown">
+	        <div>
+	        	<div>
+	                <h1 class="logo-name">특허 분석 플랫폼</h1>
+	            </div>
+	            <h3>특허 분석 플랫폼은</h3>
+	            <p>특허 분쟁을 막기위해 사전에 시행하는 특허 동향 조사의 시간적 금전적비용을<br/>절감할 수 있는 신개념특허분석 시스템 입니다.</p>
+	            <p>ID와 비밀번호를 입력하시어 로그인하십시오.</p>
+	            <form id="form" class="m-t" role="form" th:action="@{/login}" method="POST">
+	                <div class="form-group">
+	                    <input name="usrid" type="text" class="form-control" placeholder="아이디" tabindex=1 value="idpak" />
+	                    <label id="usrid-error" class="error form_error" for="usrid"></label>
+	                </div>
+	                <div class="form-group">
+	                    <input name="usrpass" type="password" class="form-control" placeholder="비밀번호" tabindex=2 value="idpak" />
+	                    <label id="usrpass-error" class="error form_error" for="usrpass"></label>
+	                </div>
+
+					<div>
+		                <p>
+                            <button id="signup" type="button" class="btn btn-w-m btn-success half-width btn_left" tabindex=4 >회원 가입</button>
+                            <button type="submit" class="btn btn-w-m btn-primary half-width btn_right" tabindex=3 >Login</button>
+                        </p>
+	                </div>
+	                
+					<div style="clear: both; padding-top: 20px;">
+						<p class="text-muted text-center">계정 및 비밀번호가 기억나지 않으면</p>
+		                <p class="text-muted text-center"><small>관리자에 연락하시기 바랍니다.</small></p>
+		                <label id="allow-error" class="error"></label>
+					</div>
+	                
+	            </form>
+	            
+	            <p class="m-t"> <small></small> </p>
+	        </div>
+	    </div>
+	</div>
+	
+	
+	<script layout:fragment="pageScript" th:inline="javascript">
+		$(document).ready(function() {
+			$("#signup").click(function() {
+				patentMovePage(/*[[@{'/concent'}]]*/);
+			});
+			
+			$("#form").validate({
+				onkeyup: false,
+				rules : {
+					usrid: {
+						required: true,
+						minlength: 5,
+						maxlength: 15
+					},
+					usrpass: {
+						required: true,
+						minlength: 5,
+						maxlength: 15
+					}
+				}, messages: {
+					usrid: {
+						required: "아이디를 입력하세요.",
+						remote : "해당 아이디는 중복되었습니다.",
+						minlength: $.validator.format("아이디는 최소 {0} 글자 이상 입력하세요."),
+						maxlength: $.validator.format("아이디는 최대 {0} 글자까지 입력하세요.")
+					},
+					usrpass: {
+						required: "비밀번호를 입력하세요.",
+						minlength: $.validator.format("비밀번호는 최소 {0} 글자 이상 입력하세요."),
+						maxlength: $.validator.format("비밀번호는 최대 {0} 글자까지 입력하세요.")
+					}
+				}, submitHandler: function(form) {
+					patentFormSubmit(/*[[@{'/login'}]]*/, {usrid:form.usrid.value, usrpass: form.usrpass.value}, 
+						function (res) {
+							if (res) {
+					        	if (res.state == 1) {
+					        		$("#form").validate().showErrors({"usrid": "아이디가 존재하지 않습니다."});
+					        	} else if (res.state == 2) {
+					        		$("#form").validate().showErrors({"usrpass": "비밀번호가 일치하지 않습니다."});
+					        	} else if (res.state == 3) {
+					        		/* $("#form").validate().showErrors({"allow": "관리자 승인이 되지 않습니다. 로그인할 수 없습니다."}); */
+					        		$("#allow-error").html("관리자 승인이 되지 않습니다. 로그인할 수 없습니다.");
+					        		$("#allow-error").show();
+					        	} else {
+					        		patentMovePage(/*[[@{'/sub'}]]*/, 1);
+					        	}
+				        	}
+						},
+						function (res) {
+							$("#allow-error").html("관리자 승인이 되지 않습니다. 로그인할 수 없습니다.");
+			        		$("#allow-error").show();
+						}
+					);
+				}
+			});
+		});
+	</script>
+</body>
+</html>

@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+
+<!--/////////////////////////////////////////////////////////////////////////////
+//
+//(c)2003-2018 ITS-I Inc. All Rights Reserved.
+//
+//THIS SOURCE FILE IS THE PROPERTY OF ITS-I Inc. AND IS NOT TO BE
+//RE-DISTRIBUTED BY ANY MEANS WHATSOEVER WITHOUT THE EXPRESSED
+//WRITTEN CONSENT OF ITS-I Inc.
+//
+//CONTACT INFORMATION:
+//support@its-i.co.kr
+//http://www.its-i.co.kr
+//
+/////////////////////////////////////////////////////////////////////////////-->
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+</head>
+
+<style layout:fragment="pageStyle" type="text/css">
+.modal-body {
+	padding: 0px;
+}
+
+.panel_select1 {
+	display: inline;
+	width: 75%;
+}
+.panel_select2 {
+	display: inline;
+	width: 37%;
+}
+.panel_select3 {
+	display: inline;
+	width: 25%;
+}
+.slick-prev {left:25px;}
+.slick-next {right:25px;}
+
+.modal_row {margin-right: 30px; margin-left: 30px; padding-top: 10px;}
+.panel-group {padding-bottom: 20px; margin-bottom: 0px;}
+.panel-body {padding: 10px 15px 0px 15px;}
+.ibox {margin-bottom: 10px;}
+
+.divError{color: red;font-size: 11pt;    text-align: center;}
+</style>
+
+<body>
+
+	<div class="row" layout:fragment="mainContent">
+		<div class="ibox float-e-margins">
+			<div class="ibox-content">
+				<div id="wizard" role="application" class="wizard clearfix">
+					<div class="steps clearfix" th:include="fragments/project :: menu"></div>
+					
+					<div class="row">
+						<div class="col-lg-12">
+							<form id="project_step3" name="project_step3" method="post" class="form-horizontal">
+								<div class="float-e-margins">
+									<div class="ibox-title">
+										<h5>무결성 검증 설정</h5>
+										<div class="ibox-tools">
+											<button type="submit" class="btn btn-primary" id="btnForm3Save" style="display: none;">저장</button>
+											<button type="button" class="btn btn-info" id="btnForm3Next">다음</button>
+										</div>
+									</div>
+								</div>
+								<div class="ibox-content project_form_content">
+									<div class="form-group">
+										<label class="col-sm-3 control-label">다피인용 특허</label>
+										<div class="col-sm-9">
+											<input type="hidden" name="id" th:field="${projectinfo.id}">
+											<input type="text" class="form-control input_text_2" id="quoted" name="quoted" th:field="${projectinfo.quoted}" maxlength="4" size="4" />건 이상 조회.
+										</div>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+					
+					<div id="integrityPatent"></div>
+				</div>
+			</div>
+		</div>
+		
+		
+		<div class="modal inmodal fade" id="integrityModal" tabindex="-1" role="dialog" aria-hidden="true" data-keyboard="false" data-backdrop="false">
+	        <div class="modal-dialog modal-lg patent_modal">
+	            <div class="modal-content">
+	                <div class="modal-header">
+	                    <h4 class="modal-title" id="title">무결성검증 결과</h4>
+	                </div>
+	                <div class="modal-body">
+	                
+					<div class="modal_row">
+              				<div id="integrityDiv"></div>
+                	</div>
+		                
+	                </div>
+					<div class="modal-footer">
+						<button type="button" id="completion" class="btn btn-info" onclick="javascript:completion();">완료</button>
+						<button type="button" id="closed" class="btn btn-info" onclick="javascript:$('#integrityModal').modal('hide');">닫기</button>
+					</div>
+				</div>
+			</div>
+	    </div>
+	</div>
+	
+	
+
+	<script layout:fragment="pageScript" th:inline="javascript">
+		var defaultStatus = /*[[${projectinfo.status}]]*/
+		var isQtd = /*[[${projectinfo.isQtd}]]*/
+			
+		$(document).ready(function() {
+			$("#btnForm3Next").click(function() {
+				var data = new FormData();
+				data.append("id", /*[[${projectId}]]*/);
+				patentFormDataSubmit(/*[[@{'/project/step3/finish'}]]*/, data,
+					function (res) {
+						patentMovePage(/*[[@{/project/step4}]]*/, 0, 0, {"id":/*[[${projectId}]]*/});
+					},
+					function () {
+						sweetalert("저장에 실패했습니다.", "error");
+					}
+				);
+			});
+			
+			
+			eventSpinner();
+			$("#integrityModal").on("shown.bs.modal", function () {
+				closedSpinner();
+			});
+		
+			$("#project_step3 .form-control").keydown(function() {
+				$("#btnForm3Save").show();
+			});
+			$("#project_step3 .form-control").each(function(i,v) {
+				if ($(this).val() > 0) {
+					$("#btnForm3Save").show();
+				}
+			});
+			$("#project_step3").validate({
+				onkeyup: false,
+				rules : {
+					quote: {
+						required: true,
+						number: true
+					},
+					quoted: {
+						required: true,
+						number: true
+					}
+				}, messages: {
+					quote: {
+						required: "(숫자로 입력하세요.)",
+						number: "(숫자로 입력하세요.)"
+					},
+					quoted: {
+						required: "(숫자로 입력하세요.)",
+						number: "(숫자로 입력하세요.)"
+					}
+				}, submitHandler: function(form) {
+					var message = swalMessage(isQtd, 0);
+					sweetsubmit({text:message}, function() {
+						patentFormSubmit(/*[[@{'/project/updateStep3'}]]*/, $(form).serialize(), 
+							function (res) {
+								sweetalert("저장에 성공했습니다.", "success", function() {
+									isQtd = 1;
+									loadSpinner();
+									loadSubPage("integrityDiv", /*[[@{/project/step3/integrityModal}]]*/, {id:/*[[${projectId}]]*/, quoted:$("#quoted").val()}, function() {
+										$('.collapse-link').click(function () {
+									        var ibox = $(this).closest('div.ibox');
+									        var button = $(this).find('i');
+									        var content = ibox.find('div.ibox-content');
+									        
+									        content.slideToggle(200);
+									        button.toggleClass('fa-chevron-up').toggleClass('fa-chevron-down');
+									        ibox.toggleClass('').toggleClass('border-bottom');
+									        setTimeout(function () {
+									            ibox.resize();
+									            ibox.find('[id^=map-]').resize();
+									        }, 50);
+									    });
+										
+										loadQtdForm(0);
+										$("#integrityModal").modal("show");
+									});
+			        			});
+							},
+							function () {
+								sweetalert("저장에 실패했습니다.", "error");
+							}
+						);
+					});
+				}
+			});
+
+			if (defaultStatus > 5) {
+				loadIntegrityPatent();
+			}
+		});
+		
+		function setClf1(slt) {
+			var id = $(slt).attr("id").substring(3);
+			$("#fms"+id).html("");
+			var select = $("#fms"+id)[0];
+
+			if (select) {
+				appendChild(select, "option", null, "선택", -1);
+				patentFormSubmit(/*[[@{'/project/step3/getClassification'}]]*/, {pi:/*[[${projectId}]]*/, id:$(slt).val()}, function(res) {
+					var obj = JSON.parse(res.message);
+					$(obj).each(function (i, v) {
+						appendChild(select, "option", null, v.v2, v.v1);
+					});
+				});
+			}
+		}
+		
+		function setClf2(slt) {
+			var id = $(slt).attr("id").substring(3);
+			$("#fmt"+id).html("");
+			var select = $("#fmt"+id)[0];
+
+			if (select) {
+				appendChild(select, "option", null, "선택", -1);
+				patentFormSubmit(/*[[@{'/project/step3/getClassification'}]]*/, {pi:/*[[${projectId}]]*/, id:$(slt).val()}, function(res) {
+					var obj = JSON.parse(res.message);
+					$(obj).each(function (i, v) {
+						appendChild(select, "option", null, v.v2, v.v1);
+					});
+				});
+			}
+		}
+		
+		function appendChild(container, tagName, className, innerHTML, value) {
+		    var child = document.createElement(tagName);
+		    container.appendChild(child);
+		    if (className) {
+		        child.className = className;
+		    }
+		    if (innerHTML) {
+		        child.innerHTML = innerHTML;
+		    }
+		    if (value || value == 0) {
+		        child.value = value;
+		    }
+		    return child;
+		}
+		
+		function loadIntegrityPatent() {
+			loadSubPage("integrityPatent", /*[[@{'/project/step3/getIntegrityInfo'}]]*/, {id:/*[[${projectId}]]*/}, function() {
+				closedSpinner();
+				loadList(0);
+			});
+		}
+		
+		function loadList(page) {
+			loadListPage("integrityPatentList", /*[[@{'/project/step3/getIntegrityPatentList'}]]*/, {id: /*[[${projectId}]]*/,page:page,limit:$("#searchLimit").val(),search:$("#searchVal").val()}, function() {
+			});	
+		}
+		
+		function completion() {
+			sweetconfirm("수정된 기술분류를 확정하시 겠습니까? 확정 이후 기술분류를 다시 수정하려면 모든 추가 다피인용 특허의 기술분류를 다시 수정해야 합니다.", null, 
+				function() {
+					patentFormSubmit(/*[[@{'/project/step3/updateQtdComplete'}]]*/, {id: /*[[${projectId}]]*/}, function(res) {
+						if (res.result) {
+							$("#integrityModal").modal("hide");
+							swal.close(); 
+							
+							loadIntegrityPatent(); 
+						} else {
+							$("#integrityModal").modal("hide");
+							swal.close(); 
+						}
+					});
+				}, function() {swal.close()}
+			);
+		}
+		
+		function loadQtdForm(page) {
+			loadListPage("qutedForm", /*[[@{'/project/step3/getQtd'}]]*/, {id: /*[[${projectId}]]*/,page:page}, function() {
+			});
+		}
+		
+		function saveQtdForm() {
+			sweetsubmit({text:"저장하시겠습니까?"}, function() {
+				loadSpinner();
+				patentFormSubmit(/*[[@{'/project/step3/updateQtdForm'}]]*/, $("#integritForm").serialize(), function(res) {
+					closedSpinner();
+					
+					if ($("#crrntPg").html()*1 < $("#ttlPg").html()*1) {
+						swal.close();
+						loadQtdForm($("#crrntPg").html()*1);
+					} else {
+						setTimeout(function() {completion();}, 500);
+					}
+					
+				});
+			});
+		}
+
+		function downExcelAction() {
+			downExcel(/*[[@{'/project/downloadExcel/'} + ${projectId} + '/3']]*/, $("#searchVal").val());
+		}
+	</script>
+
+</body>
+</html>

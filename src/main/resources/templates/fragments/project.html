@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+
+<!--/////////////////////////////////////////////////////////////////////////////
+//
+//(c)2003-2017 ITS-I Inc. All Rights Reserved.
+//
+//THIS SOURCE FILE IS THE PROPERTY OF ITS-I Inc. AND IS NOT TO BE
+//RE-DISTRIBUTED BY ANY MEANS WHATSOEVER WITHOUT THE EXPRESSED
+//WRITTEN CONSENT OF ITS-I Inc.
+//
+//CONTACT INFORMATION:
+//support@its-i.co.kr
+//http://www.its-i.co.kr
+//
+/////////////////////////////////////////////////////////////////////////////-->
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+<body>
+	<div th:fragment="mainList">
+		<div class="table-responsive">
+			<div class="dataTables_wrapper form-inline dt-bootstrap">
+				<table id="dataList" class="table table-striped table-bordered table-hover dataTables-example dataTable">
+					<thead>
+						<tr>
+				      		<th></th>
+							<th>프로젝트 명</th>
+							<th>생성 일자</th>
+							<th>기술 분류</th>
+							<th>문헌 설정</th>
+							<th>진행 단계</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="data : ${list}" th:onclick="'javascript:projectViewPage(\''+${data.id}+'\');'">
+							<td th:text="${data.rownum}"></td>
+							<td th:text="${data.name}"></td>
+							<td th:text="${data.regDate}"></td>
+							<td><span th:text="${data.classification}+'뎁스'"></span></td>
+							<td >
+								<span th:text="${data.bulletin} == 3 ? '등록공보'"></span>
+								<span th:text="${data.bulletin} == 2 ? '공개공보'"></span>
+								<span th:text="${data.bulletin} == 6 ? '등록공보 &amp; 공개공보'"></span>
+							</td>
+							<td th:switch="${data.status}">
+								<span th:case="'1'">프로젝트 생성</span>
+								<span th:case="'2'">프로젝트 생성</span>
+								<span th:case="'3'">노이즈 필터링</span>
+								<span th:case="'4'">노이즈 필터링</span>
+								<span th:case="'5'">무결성 검증</span>
+								<span th:case="'6'">무결성 검증</span>
+								<span th:case="'7'">특허 추천</span>
+								<span th:case="'8'">특허 추천</span>
+								<span th:case="'9'">분석 리포팅</span>
+								<span th:case="'10'">프로젝트 종료</span>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				
+				<div th:include="fragments/pageable :: pageable"></div>
+			</div>
+		</div>
+	</div>
+	
+	<div th:fragment="menu">
+		<ul role="tablist">
+			<li role="tab" class="first" th:classappend="${state eq 1} ? 'current' : 'done'" aria-selected="true">
+				<a th:href="${state gt 1} ? 'javascript:projectView(\''+@{/project/step}+'\',\''+${projectId}+'\', \'2\')' : 'javascript:void(0)'"><span class="number">01.</span> 프로젝트 생성</a>
+			</li>
+			<li role="tab" th:class="${state eq 2} ? 'current' : (${state le 2} ? 'disabled' : 'done')" aria-disabled="true">
+				<a th:href="${state gt 2} ? 'javascript:projectView(\''+@{/project/step}+'\',\''+${projectId}+'\', \'4\')' : 'javascript:void(0)'"><span class="number">02.</span> 노이즈 필터링</a>
+			</li>
+			<li role="tab" th:class="${state eq 3} ? 'current' : (${state le 3} ? 'disabled' : 'done')" aria-disabled="true">
+				<a th:href="${state gt 3} ? 'javascript:projectView(\''+@{/project/step}+'\',\''+${projectId}+'\', \'6\')' : 'javascript:void(0)'"><span class="number">03.</span> 무결성 검증</a>
+			</li>
+			<li role="tab" th:class="${state eq 4} ? 'current' : (${state le 4} ? 'disabled' : 'done')" aria-disabled="true">
+				<a th:href="${state gt 4} ? 'javascript:projectView(\''+@{/project/step}+'\',\''+${projectId}+'\', \'8\')' : 'javascript:void(0)'"><span class="number">04.</span> 특허 추천</a>
+			</li>
+			<li role="tab" class="last" th:classappend="${state eq 5} ? 'current' : (${state eq 6} ? 'done' : 'disabled')" aria-disabled="true">
+				<a th:href="${state gt 5} ? 'javascript:projectView(\''+@{/project/step}+'\',\''+${projectId}+'\', \'10\')' : 'javascript:void(0)'"><span class="number">05.</span> 분석 결과 리포팅</a>
+			</li>
+		</ul>
+	</div>
+
+
+
+
+
+
+
+ 	<div th:fragment="form1">
+		<div class="row">
+			<div class="col-lg-12">
+				<form id="project_step1" name="project_step1" method="post" class="form-horizontal" enctype="multipart/form-data">
+					<div class="ibox float-e-margins">
+						<div class="ibox-title">
+							<h5>프로젝트 생성 설정</h5>
+							<div class="ibox-tools">
+								<button type="submit" class="btn btn-primary" id="btnForm1Save">저장</button>
+								<button type="button" class="btn btn-info" id="btnForm1Next" style="display: none;">다음</button>
+							</div>
+						</div>
+						<div class="ibox-content project_form_content">
+							<div class="form-group">
+								<label class="col-sm-2 control-label">프로젝트명</label>
+								<div class="col-sm-10">
+									<input type="hidden" name="id" th:field="${projectinfo.id}" />
+									<input type="text" class="form-control" id="name" name="name" th:field="${projectinfo.name}"/>
+									<label id="name-error" class="error form_error" for="name"></label>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">생성일자</label>
+								<div class="col-sm-10 project_form_right0">
+									<div class="col-sm-4 project_form_left0">
+										<div class="input-group date">
+											<span class="input-group-addon">
+												<i class="fa fa-calendar"></i>
+											</span>
+											<input type="text" class="form-control" id="regDate" name="regDate" th:field="${projectinfo.regDate}" />
+											<label id="regDate-error" class="error form_error" for="regDate"></label>
+										</div>
+									</div>
+									<div class="col-sm-8 project_form_right0">
+										<label class="col-sm-2 control-label">문헌설정</label>
+										<div class="col-sm-10">
+											<select id="bulletin" name="bulletin" class="form-control" th:field=${projectinfo.bulletin}>
+												<option value="6">등록 공보 &amp; 공개 공보</option>
+												<option value="3" selected>등록 공보</option>
+												<option value="2">공개 공보</option>
+											</select>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">기술분류</label>
+								<div class="col-sm-10">
+									<select id="classification" name="classification" class="form-control" style="width: 130px;" th:field="${projectinfo.classification}">
+										<option value="1">1</option>
+										<option value="2">2</option>
+										<option value="3" selected>3</option>
+									</select>
+									<div style="float: left;margin-top: -37px;margin-left: 150px;">
+										<a href="javascript:showModal('classificationModal');" class="btn btn-primary btn-sm" style="margin-top: 5px;margin-left: 20px;">편집</a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div id="classificationInfoStep1" class="row"></div>
+				</form>
+			</div>
+		</div>
+		
+		<div id="listStep1" class="ibox-content"></div>
+	</div>
+	
+	<div th:fragment="list">
+		<div class="table-responsive">
+			<div class="dataTables_wrapper form-inline dt-bootstrap">
+				<table id="dataList" class="table table-striped table-bordered table-hover dataTables-example dataTable">
+					<thead>
+				      <tr>
+				         <th>Name</th>
+				         <th>Position</th>
+				         <th>Office</th>
+				         <th>Extn</th>
+				         <th>Start date</th>
+				         <th>Salary</th>
+				      </tr>
+				   </thead>
+				   <tfoot>
+				      <tr>
+				         <th>Name</th>
+				         <th>Position</th>
+				         <th>Office</th>
+				         <th>Age</th>
+				         <th>Start date</th>
+				         <th>Salary</th>
+				      </tr>
+				   </tfoot>
+				</table>
+			</div>
+		</div>
+		<div class="col-lg-12" th:include="fragments/pageable :: pageable"></div>
+	</div>
+	
+	<div id="nestable" th:fragment="classificationTable">
+		<div class="dd">
+			<ol class="dd-list">
+				<li class="dd-item editable dd-item-dept0" th:each="root : ${data}" th:id="${root.item.id}" th:attr="data-id=${root.item.id}, data-dept=0">
+					<div class="dd-handle" th:onclick="'javascript:setClassification(0, \''+${root.item.id}+'\');'">
+						<span class="editableName" th:text="${root.item.value}"></span>
+					</div>
+					
+					<ol class="dd-list" th:if="${root.children.size() != 0}">
+						<li class="dd-item editable dd-item-dept1" th:each="dept1 : ${root.children}" th:id="${dept1.item.id}" th:attr="data-id=${dept1.item.id}, data-dept=1">
+							<div class="dd-handle" th:onclick="'javascript:setClassification(1, \''+${dept1.item.id}+'\');'">
+								<span th:if="${dept1.item.code != null}" class="editableName" th:text="${dept1.item.value} + ' (' + ${dept1.item.code} + ')'"></span>
+								<span th:unless="${dept1.item.code != null}" class="editableName" th:text="${dept1.item.value}"></span>
+							</div>
+							
+							<ol class="dd-list" th:if="${dept1.children.size() != 0}">
+								<li class="dd-item editable dd-item-dept2" th:each="dept2 : ${dept1.children}" th:id="${dept2.item.id}" th:attr="data-id=${dept2.item.id}, data-dept=2">
+									<div class="dd-handle" th:onclick="'javascript:setClassification(2, \''+${dept1.item.id}+'\', \''+${dept2.item.id}+'\');'">
+										<span th:if="${dept2.item.code != null}" class="editableName" th:text="${dept2.item.value} + ' (' + ${dept2.item.code} + ')'"></span>
+										<span th:unless="${dept2.item.code != null}" class="editableName" th:text="${dept2.item.value}"></span>
+									</div>
+									
+									<ol class="dd-list" th:if="${dept2.children.size() != 0}">
+										<li class="dd-item editable dd-item-dept3" th:each="dept3 : ${dept2.children}" th:id="${dept3.id}" th:attr="data-id=${dept3.id}, data-dept=3">
+											<div class="dd-handle" th:onclick="'javascript:setClassification(3, \''+${dept1.item.id}+'\', \''+${dept2.item.id}+'\', \''+${dept3.id}+'\');'">
+												<span th:if="${dept3.code != null}" class="editableName" th:text="${dept3.value} + ' (' + ${dept3.code} + ')'"></span>
+												<span th:unless="${dept3.code != null}" class="editableName" th:text="${dept3.value}"></span>
+											</div>
+										</li>
+									</ol>
+								</li>
+							</ol>
+						</li>
+					</ol>
+				</li>
+			</ol>
+		</div>
+        <script type="text/javascript">
+            $('#nestable').nestable('collapseAll');
+            $('.dd-item').on("mousedown", function(e) {
+                e.preventDefault();
+                return false;
+            });
+        </script>
+    </div>
+    
+    <div th:fragment="classificationForm">
+		<div class="ibox-content project_step1_div">
+			<h3 th:text="${ERROR}" style="text-align:center;"></h3>
+			<table class="table table-bordered project_step1">
+				<tbody>
+					<tr th:each="element,status : ${table}">
+						<td th:if="${element.dept1}" class="td_button" th:rowspan="${element.isCountDept1} ? ${element.dept1.id}">
+							<div th:text="${element.dept1.name}"></div>
+							<div th:if="${element.dept1.code != null}" th:text="'('+${element.dept1.code}+')'"></div>
+						</td>
+						<td th:if="${element.dept2}" class="td_button" th:rowspan="${element.isCountDept2} ? ${element.dept2.id}">
+							<div th:text="${element.dept2.name}"></div>
+							<div th:if="${element.dept2.code != null}" th:text="'('+${element.dept2.code}+')'"></div>
+						</td>
+						<td th:if="${element.dept3}" class="td_button">
+							<div th:text="${element.dept3.name}"></div>
+							<div th:if="${element.dept3.code != null}" th:text="'('+${element.dept3.code}+')'"></div>
+						</td>
+						<td class="td_file">
+							<div class="form-group project_classification_form_group">
+								<label class="col-sm-2 control-label">검색식</label>
+								<div class="col-sm-10">
+									<textarea rows="5" cols="" class="form-control" style="resize: none;background: #fff;" th:id="'search_formula'+${status.index}" th:text="${element.info.search}" readonly></textarea>
+								</div>
+							</div>
+							<div class="form-group project_classification_form_group">
+								<label class="col-sm-2 control-label">검색 설명</label>
+								<div class="col-sm-10">
+									<textarea rows="5" cols="" class="form-control" style="resize: none;background: #fff;" th:id="'search'+${status.index}" th:text="${element.info.remarks}" readonly></textarea>
+								</div>
+							</div>
+							<div class="form-group project_classification_form_group" style="padding-bottom: 20px;">
+								<label class="col-sm-2 control-label">검색 파일</label>
+								<div class="col-sm-10 classification_form_file_div">
+									<input class="form-control tagsinput" th:id="'txtFileTagsinput'+${status.index}" type="text" style="width: 100%;"/>
+									<div class="div_file_tagsinput" th:id="'divFileTagsinput'+${status.index}" th:text="${element.info.files}" style="display: none;"></div>
+									
+									<label th:id="'file-error-'+${status.index}" class="error form_error_2"></label>
+								</div>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+    </div>
+    
+    <div th:fragment="duplicatePatentForm">
+    	<div th:each="data,dtStatus : ${map}" style="border-bottom: solid 1px #c7c8c7;">
+    		<div class="row" th:style="${dtStatus.index} > 0 ? 'margin-top: 15px;'">
+	    		<div class="col-lg-7" >
+					<div class="row">
+						<div style="float: left;width: 19%;min-width: 100px;padding-left: 20px;line-height: 20px;">
+							<label class="col-sm-6 control-label duplicate_form_first duplicate_form_label">국가:</label>
+							<label class="col-sm-6 control-label text_normal duplicate_form_label" th:text="${data.key.NAT}"></label>
+						</div>
+						<div style="float: left;width: 49%;min-width: 200px;line-height: 20px;">
+							<label class="col-sm-5 control-label duplicate_form_second duplicate_form_label">출원번호:</label>
+							<label class="col-sm-7 control-label text_normal duplicate_form_label"><a th:href="${data.key.APPNMURL}?${data.key.APPNMURL}:'javascript:void(0);'" th:text="${data.key.APPNM}" target="_blank"></a></label>
+						</div>
+						<div style="float: left;width: 29%;min-width: 100px;line-height: 20px;">
+							<label class="col-sm-5 control-label duplicate_form_second duplicate_form_label">문헌 종류:</label>
+							<label class="col-sm-7 control-label text_normal duplicate_form_label" th:text="${data.key.DCT}"></label>
+						</div>
+					</div>
+					<pre class="m-t-sm text_pre_view_text" th:text="${data.key.RMKS}" style="margin-top:0px;"></pre>
+				</div>
+				<div class="col-lg-5">
+					<label class="col-sm-12 control-label" style="text-align: center;">기술 분류등선록택</label>
+					<div class="row">
+						<div class="col-lg-12 text_pre_view_table">
+							<table class="table table-striped">
+								<thead>
+									<tr>
+										<th style="width: 30px;"><input type="checkbox" checked class="i-checks" th:name="'All'+${data.key.APPNM}+${dtStatus.index}" /></th>
+										<th style="text-align: center;">기술분류</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr th:each="patent,status : ${data.value}">
+										<td colspan="2">
+											<label class="checkbox-inline i-checks"> <input type="checkbox" class="i-checks" th:value="${patent.id}" th:name="${data.key.APPNM}+${dtStatus.index}" checked/>&nbsp;&nbsp;<span th:text="${patent.classification}"></span>  </label>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+	    	</div>
+    	</div>
+    </div>
+    
+    <div th:fragment="duplicatePatent">
+    	<div class="ibox float-e-margins">
+			<div class="ibox-title">
+				<h5>최초 분석 대상 특허 데이터</h5>
+			</div>
+			<div class="ibox-content project_form_content">
+		    	업로드된 엑셀 데이터의 수집 결과 <span th:text="${dpcnt}"></span>건의 중복 특허건을 제거 <th:block th:if="${unisize} > 0">하고 <span th:text="${unistring}"></span> <span th:text="${unisize}"></span>개 출원인 데이터에 대한 유니 피케이션을</th:block> 수행하였습니다.
+		    	
+		    	<div class="table-responsive" id="duplicatePatentList">
+				</div>
+			</div>
+		</div>
+    </div>
+    
+    <div th:fragment="noisePatent">
+    	<div class="ibox float-e-margins">
+			<div class="ibox-title">
+				<h5> 노이즈 필터링 결과 분석 대상 특허 데이터</h5>
+			</div>
+			<div class="ibox-content project_form_content">
+		    	노이즈 필터링 결과 최초 분석 대상 특허 데이터 총 <label th:text="${noise.v1}"></label>건 중 노이즈로 판단된 <label th:text="${noise.v2}"></label>건의 특허를 분석 대상에서 제거하였습니다.
+		    	
+		    	<div class="table-responsive" id="finalNoisePatentList">
+				</div>
+			</div>
+		</div>
+    </div>
+    
+    <div th:fragment="integrityPatent">
+	    <div class="ibox float-e-margins">
+			<div class="ibox-title">
+				<h5>무결성 검증 결과 분석 대상 유효 특허 데이터</h5>
+			</div>
+			<div class="ibox-content project_form_content">
+		    	무결성 검증 결과 노이즈 필터링 된 특허 데이터 총 <th:block th:text="${total}"/>건에 대하여 누락된 패밀리 특허 <th:block th:text="${fmly}"/>건, 다피인용특허 <th:block th:text="${qtd}"/>건의 특허를 분석 대상에 추가하였습니다.
+		    	
+		    	<div class="table-responsive" id="integrityPatentList">
+				</div>
+			</div>
+		</div>
+	</div>
+    
+    
+    <div th:fragment="stepFinalPatentEmpty">
+    </div>
+    <div th:fragment="stepFinalPatentList">
+		<div class="dataTables_wrapper form-inline dt-bootstrap">
+			<div style="float: left; width: 100%; padding-bottom: 5px;">
+				<div style="float: left; display: inline-block;">
+					<div th:text="${pageable.limit}"></div>
+					Show <select id="searchLimit" class="form-control"><option th:selected="(${pageable.onepagelstcnt} == 10)">10</option><option th:selected="(${pageable.onepagelstcnt} == '20')">20</option><option th:selected="(${pageable.onepagelstcnt} == '50')">50</option></select>  entries
+				</div>
+				<div style="float: right; display: inline-block;">
+					Search : <input id="searchVal" type="text" class="" th:value="${pageable.search}" />
+					<a href="javascript:loadList(1);" class="btn btn-primary btn-sm">검색</a>
+					<a href="javascript:downExcelAction();" class="btn btn-primary btn-sm">Excel</a>
+				</div>
+			</div>
+			<table id="dataList" class="table table-striped table-bordered table-hover dataTables-example dataTable">
+				<thead>
+					<tr>
+						<th>기술분류</th>
+						<th>구분</th>
+						<th>국가</th>
+						<th>발명의명칭</th>
+						<th>출원번호</th>
+						<th>출원인</th>
+						<th>상태정보</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="patent,status : ${list}">
+						<td th:text="${patent.strClss}" class="minth"></td>
+						<td th:text="${patent.PTT}" class="minth"></td>
+						<td th:text="${patent.NAT}" class="minth"></td>
+						<td th:text="${patent.NMITN}" class="minth4"></td>
+						<td th:if="${patent.APPNMURL != null}" class="minth2"><a th:href="${patent.APPNMURL}" th:text="${patent.APPNM}" target="_blank"></a></td>
+						<th th:if="${patent.APPNMURL == null}" th:text="${patent.APPNM}" class="minth2"></th>
+<!-- 						<td><a th:href="${patent.APPNMURL}?${patent.APPNMURL}:'javascript:void(0);'" th:text="${patent.APPNM}" target="_blank"></a></td> -->
+						<td th:text="${patent.APLCT}" class="minth3"></td>
+						<td th:text="${patent.STS}" class="minth"></td>
+					</tr>
+				</tbody>
+			</table>
+			
+			<div th:include="fragments/pageable :: pageable"></div>
+		</div>
+    </div>
+    <div th:fragment="step4FinalPatentList">
+		<div class="dataTables_wrapper form-inline dt-bootstrap">
+			<div style="float: left; width: 100%; padding-bottom: 5px;">
+				<div style="float: left; display: inline-block;">
+					<div th:text="${pageable.limit}"></div>
+					Show <select id="searchLimit" class="form-control"><option th:selected="(${pageable.onepagelstcnt} == 10)">10</option><option th:selected="(${pageable.onepagelstcnt} == '20')">20</option><option th:selected="(${pageable.onepagelstcnt} == '50')">50</option></select>  entries
+				</div>
+				<div style="float: right; display: inline-block;">
+					Search : <input id="searchVal" type="text" class="" th:value="${pageable.search}" />
+					<a href="javascript:loadList(1);" class="btn btn-primary btn-sm">검색</a>
+					<a href="javascript:downExcelAction();" class="btn btn-primary btn-sm">Excel</a>
+				</div>
+			</div>
+			<table id="dataList" class="table table-striped table-bordered table-hover dataTables-example dataTable">
+				<thead>
+					<tr>
+						<th>기술분류</th>
+						<th>구분</th>
+						<th>국가</th>
+						<th>발명의명칭</th>
+						<th>출원번호</th>
+						<th>출원인</th>
+						<th>상태정보</th>
+						<th>점수</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="patent,status : ${list}">
+						<td th:text="${patent.strClss}" class="minth"></td>
+						<td th:text="${patent.PTT}" class="minth"></td>
+						<td th:text="${patent.NAT}" class="minth"></td>
+						<td th:text="${patent.NMITN}" class="minth4"></td>
+						<td th:if="${patent.APPNMURL != null}" class="minth2"><a th:href="${patent.APPNMURL}" th:text="${patent.APPNM}" target="_blank"></a></td>
+						<th th:if="${patent.APPNMURL == null}" th:text="${patent.APPNM}" class="minth2"></th>
+<!-- 						<td><a th:href="${patent.APPNMURL}?${patent.APPNMURL}:'javascript:void(0);'" th:text="${patent.APPNM}" target="_blank"></a></td> -->
+						<td th:text="${patent.APLCT}" class="minth3"></td>
+						<td th:text="${patent.STS}" class="minth"></td>
+						<td th:text="${patent.scr}" class="minth"></td>
+					</tr>
+				</tbody>
+			</table>
+			
+			<div th:include="fragments/pageable :: pageable"></div>
+		</div>
+    </div>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+	
+	<div th:fragment="form2">
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="ibox float-e-margins">
+					<div class="ibox-title">
+						<h5>프로젝트 생성 설정</h5>
+						<div class="ibox-tools">
+							<a href="javascript:showQuestion();" class="btn btn-primary btn-sm">저장</a>
+						</div>
+					</div>
+					<div class="ibox-content project_form_content">
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div th:include="fragments/project :: list" class="ibox-content"></div>
+	</div>
+    
+    <div th:fragment="noiseList">
+    	<div th:if="${error == '1'}"  class="pop_empty">
+    		다른 사용자가 사용 중 입니다.<br/>10분 후 다시 시도하십시오.
+    		<script th:inline="javascript">
+	    		$("#review").hide();
+	    		$("#skip").hide()
+	    		$("#completion").hide();
+	    		$("#closed").show();
+    		</script>
+    	</div>
+    	<div th:if="${error == '2'}"  class="pop_empty">
+    		이전 프로세스가 가동 중입니다.<br/>3분 후 다시 시도하십시오.
+    		<script th:inline="javascript">
+	    		$("#review").hide();
+	    		$("#completion").hide();
+	    		$("#closed").show();
+    		</script>
+    	</div>
+    	<div th:if="${error == '0'}">
+	    	<div th:if="${empty}" class="pop_empty">
+	    		<script th:inline="javascript">
+		    		$("#review").hide();
+		    		$("#completion").show();
+		    		$("#closed").hide();
+	    		</script>
+	    		선택할 항목이 존재하지 않습니다.<br/>
+	    		"검토 완료" 하십시오.
+	    	</div>
+	    	<div th:unless="${empty}">
+	    		<script th:inline="javascript">
+		    		$("#review").show();
+		    		$("#skip").show()
+		    		$("#completion").show();
+		    		$("#closed").hide();
+	    		</script>
+		    	<form id="noiseForm">
+			    	<div th:each="data,status : ${list}">
+			    		<div class="row row_panel">
+			    			<div class="panel panel-default">
+			       				<div class="panel-heading">
+									<table class="col-sm-12 float_clear">
+										<tr>
+											<th class="col-sm-2">국가:<span th:text="${data.NAT}"></span></th>
+											<th class="col-sm-3">출원번호:<a th:href="${data.APPNMURL}?${data.APPNMURL}:'javascript:void(0);'" th:text="${data.APPNM}" target="_blank"></a></th>
+											<th class="col-sm-2">문헌종류:<span th:text="${data.DCT}"></span></th>
+											<th class="col-sm-5" style="float: right;">
+												<div class="switch">
+													<div class="onoffswitch">
+														<input type="checkbox" checked class="onoffswitch-checkbox" th:id="'noise'+${data.id}">
+														<label class="onoffswitch-label" th:for="'noise'+${data.id}">
+															<span class="onoffswitch-inner"></span>
+															<span class="onoffswitch-switch"></span>
+														</label>
+													</div>
+												</div>
+											</th>
+										</tr>
+									</table>
+								</div>
+								<div class="panel-body">
+									<div class="col-sm-12 panel_clearside">
+										<pre class="text_pre_view_text" th:text="${data.RMKS}"></pre>
+									</div>
+									<div class="col-sm-12 panel_clearside">
+										<pre class="text_pre_view_text" th:text="${data.RTVCLS}"></pre>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</form>
+	    	</div>
+    	</div>
+    </div>
+    
+    <div th:fragment="integrityForm">
+    	<div class="row">
+	    	<div class="col-lg-12">
+	    	
+	    		<div th:switch="${hasError}">
+	    			<div th:case="false">
+	    				<script type="text/javascript">
+	    				$("#closed").hide();
+	    				$("#completion").show();
+	    				</script>
+	    				<div class="ibox float-e-margins">
+			    			<div class="ibox-title">
+			    				<h5>누락 패밀리 특허 (총 <span th:text="${fmListSize}"></span>건): 해당 누락 패밀리 특허건들이 모특허의 기술분류로 추가 되었습니다.</h5>
+			    			</div>
+			    		</div>
+			    		<div class="ibox float-e-margins collapsed">
+			    			<div class="ibox-title">
+			    				<h5>추가 다피인용 특허 (총 <span th:text="${qtdListSize}"></span>건): 목록을 펼쳐 누락된 다피인용특허의 기술분류를 확인(수정)하십시오.</h5>
+			    				<div class="ibox-tools">
+									<a class="collapse-link">
+										<i class="fa fa-chevron-up"></i>
+									</a>
+								</div>
+			    			</div>
+			    			<div class="ibox-content">
+			    				<div class="panel panel-default">
+									<div id="qutedForm"> </div>
+								</div>
+			    			</div>
+			    		</div>
+	    			</div>
+	    			<div th:case="true">
+	    				<script type="text/javascript">
+	    				$("#closed").show();
+	    				$("#completion").hide();
+	    				</script>
+	    				<div th:text="${error}" class="divError"></div>
+	    				<div style="padding-bottom: 10px;" class="divError">관리자에게 문의하십시오.</div>
+	    			</div>
+	    		</div>
+	    	</div>
+    	</div>
+    </div>
+    
+    
+    
+    <div th:fragment="qutedForm">
+    	<form id="integritForm" name="integritForm" method="post" class="form-horizontal">
+    	<input type="hidden" name="projectId" th:value="${data.projectId}" />
+    	<input type="hidden" name="id" th:value="${data.id}" />
+    	<div class="panel-heading">
+			<table class="col-sm-12 float_clear">
+				<tr>
+					<th class="col-sm-2">국가:<th:block th:text="${data.NAT}" /></th>
+					<th class="col-sm-3">출원번호:<a th:href="${data.APPNMURL}?${data.APPNMURL}:'javascript:void(0);'" th:text="${data.APPNM}" target="_blank"></a></th>
+					<th class="col-sm-2">문헌종류:<th:block th:text="${data.DCT}"/></th>
+					<th class="col-sm-5">기술 분류:
+						<select id="fmf" name="clss1" class="form-control" th:classappend="${clf}==1?'panel_select1':(${clf}==2?'panel_select2':'panel_select3')" th:onchange="${clf>1}?'javascript:setClf1(this);'">
+							<option th:each="fc : ${frstCls}" th:value="${fc.v1}" th:text="${fc.v2}" th:selected="(${fc.v1} == ${data.clss1})"></option>
+						</select>
+						<select id="fms" name="clss2" class="form-control" th:if="${clf>1}" th:classappend="${clf}==1?'panel_select1':(${clf}==2?'panel_select2':'panel_select3')" th:onchange="${clf>2}?'javascript:setClf2(this);'">
+							<option th:each="fc : ${data.clss2List}" th:value="${fc.v1}" th:text="${fc.v2}" th:selected="(${fc.v1} == ${data.clss2})"></option>
+						</select>
+						<select id="fmt" name="clss3" class="form-control" th:if="${clf>2}" th:classappend="${clf}==1?'panel_select1':(${clf}==2?'panel_select2':'panel_select3')">
+							<option th:each="fc : ${data.clss3List}" th:value="${fc.v1}" th:text="${fc.v2}" th:selected="(${fc.v1} == ${data.clss3})"></option>
+						</select>
+					</th>
+				</tr>
+			</table>
+		</div>
+		<div class="panel-body">
+			<div class="col-sm-12 panel_clearside">
+				<pre class="text_pre_view_text" th:text="${data.RMKS}"></pre>
+			</div>
+		</div>
+		<div class="panel-body">
+			<div style="width: 100%; padding: 0px 10px 10px 10px;">
+				<div style="float: left;">
+					<div th:if="${pg != 0}" style="display: inline-block;margin: 0px 6px;">
+						<button type="button" class="btn btn-info" th:onclick="'javascript:loadQtdForm(\''+(${pg}-1)+'\');'"><</button>
+					</div>
+					<div style="display: inline-block;margin: 0px 6px;"><h2><span id="crrntPg" th:text="${pg}+1"></span>/<span id="ttlPg" th:text="${ttlPg}"></span></h2></div>
+					<div th:if="${pg+1 != ttlPg}" style="display: inline-block;margin: 0px 6px;">
+						<button type="button" class="btn btn-info" th:onclick="'javascript:loadQtdForm(\''+(${pg}+1)+'\');'">></button>
+					</div>
+				</div>
+				<div style="float: right;">
+					<button type="button" class="btn btn-info" onclick="javascript:saveQtdForm();">변경</button>
+				</div>
+			</div>
+		</div>
+		</form>
+    </div>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+	
+	<div th:fragment="form3">
+		FORM3
+	</div>
+	
+	<div th:fragment="form4">
+		FORM4
+	</div>
+	
+	<div th:fragment="form5">
+		FORM5
+	</div>
+	
+	
+</body>
+</html>

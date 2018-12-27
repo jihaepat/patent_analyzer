@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+
+<!--/////////////////////////////////////////////////////////////////////////////
+//
+//(c)2003-2018 ITS-I Inc. All Rights Reserved.
+//
+//THIS SOURCE FILE IS THE PROPERTY OF ITS-I Inc. AND IS NOT TO BE
+//RE-DISTRIBUTED BY ANY MEANS WHATSOEVER WITHOUT THE EXPRESSED
+//WRITTEN CONSENT OF ITS-I Inc.
+//
+//CONTACT INFORMATION:
+//support@its-i.co.kr
+//http://www.its-i.co.kr
+//
+/////////////////////////////////////////////////////////////////////////////-->
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+
+<style layout:fragment="pageStyle" type="text/css">
+.row {margin-right: 0;margin-left: 0;}
+</style>
+
+</head>
+
+<body style="padding-right: 0px !important;">
+	
+	<div class="row" layout:fragment="mainContent">
+		<div class="middle-box text-center animated fadeInDown">
+	        <div>
+	        	<div>
+	        		<h1 class="logo-name">신개념 특허 검색 도구!</h1>
+	            </div>
+	            
+	            <div class="row">
+		            <div class="col-md-12">
+		            	<div class="wrapper wrapper-content">
+		            		<div class="row">
+		            			<div class="col-md-3">
+		            				<div class="ibox float-e-margins">
+		            					<div class="ibox-title">
+		            						<h5>무결성 검증</h5>
+		            					</div>
+		            					<div class="ibox-content">
+		            						특허 검색 결과를 노이즈 필터링하여 찾고 싶지 않았던 특허들을 걸러 내어 검색결과의 정합성을 높입니다.
+		            					</div>
+		            				</div>
+		            			</div>
+		            			
+		            			<div class="col-md-3">
+		            				<div class="ibox float-e-margins">
+		            					<div class="ibox-title">
+		            						<h5>노이즈 필터링</h5>
+		            					</div>
+		            					<div class="ibox-content">
+		            						특허 검색 결과를 노이즈 필터링하여 찾고 싶지 않았던 특허들을 걸러 내어 검색결과의 정합성을 높입니다.
+		            					</div>
+		            				</div>
+		            			</div>
+		            			
+		            			<div class="col-md-3">
+		            				<div class="ibox float-e-margins">
+		            					<div class="ibox-title">
+		            						<h5>특허 추천</h5>
+		            					</div>
+		            					<div class="ibox-content">
+		            						특허 검색 결과를 노이즈 필터링하여 찾고 싶지 않았던 특허들을 걸러 내어 검색결과의 정합성을 높입니다.
+		            					</div>
+		            				</div>
+		            			</div>
+		            			
+		            			<div class="col-md-3">
+		            				<div class="ibox float-e-margins">
+		            					<div class="ibox-title">
+		            						<h5>리포팅</h5>
+		            					</div>
+		            					<div class="ibox-content">
+		            						특허 검색 결과를 노이즈 필터링하여 찾고 싶지 않았던 특허들을 걸러 내어 검색결과의 정합성을 높입니다.
+		            					</div>
+		            				</div>
+		            			</div>
+		            		</div>
+		            	</div>
+		            </div>
+	            </div>
+	            <div th:if="${session.patent_login_session}">
+	                <p>
+						<button type="button" class="btn btn-w-m btn-success half-width" id="createProject">특허분석 실행</button>
+					</p>
+                </div>
+			</div>
+		</div>
+				
+		<div class="modal inmodal fade" id="createProjectModal" tabindex="-1" role="dialog" aria-hidden="true">
+	        <div class="modal-dialog modal-lg">
+	            <div class="modal-content">
+	                <div class="modal-header">
+	                    <button type="button" class="close" data-dismiss="modal">
+	                        <span aria-hidden="true">&times;</span>
+	                        <span class="sr-only">Close</span>
+	                    </button>
+	                    <h4 class="modal-title" id="title">프로젝트 생성</h4>
+	                </div>
+	                
+	                <form id="classifiationForm" role="form" th:action="@{/project/insertPorject}" method="POST" class="form-horizontal">
+	                	<div class="modal-body">
+							<div class="row">
+								<div class="form-group">
+									<label class="col-sm-2 control-label">프로젝트명</label>
+									<div class="col-sm-10">
+										<input type="text" class="form-control" id="name" name="name">
+										<label id="name-error" class="error form_error" for="name"></label>	
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label">생성일자</label>
+									<div class="col-sm-10">
+										<div class="input-group date">
+											<span class="input-group-addon">
+												<i class="fa fa-calendar"></i>
+											</span>
+											<input type="text" class="form-control" id="regDate" name="regDate" />
+											<label id="regDate-error" class="error form_error" for="regDate"></label>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label">문헌설정</label>
+									<div class="col-sm-10">
+										<select id="bulletin" name="bulletin" class="form-control">
+											<option value="6">등록 공보 &amp; 공개 공보</option>
+											<option value="2" selected>등록 공보</option>
+											<option value="3">공개 공보</option>
+										</select>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label">기술분류</label>
+									<div class="col-sm-10">
+										<select id="classification" name="classification" class="form-control">
+											<option value="1">1</option>
+											<option value="2">2</option>
+											<option value="3" selected>3</option>
+										</select>
+									</div>
+								</div>
+							</div>
+		                </div>
+		                
+	                    <div class="modal-footer">
+	                        <button type="button" class="btn btn-primary" data-dismiss="modal">닫기</button>
+	                        <button type="submit" class="btn btn-primary">저장</button>
+	                    </div>
+                    </form>
+	            </div>
+	        </div>
+	    </div>
+	</div>
+	
+	<script layout:fragment="pageScript" th:inline="javascript">
+		$(document).ready(function() {
+			$("#createProject").click(function () {
+				allClearForm("classifiationForm");
+				$("#regDate").datepicker( "setDate" , new Date() );
+
+				$("#createProjectModal").modal("toggle");
+			});
+			
+			$('.input-group.date').datepicker({
+                todayBtn: "linked",
+                keyboardNavigation: false,
+                forceParse: false,
+                calendarWeeks: true,
+                autoclose: true
+            });
+			
+			$('.i-checks').iCheck({
+                checkboxClass: 'icheckbox_square-green',
+                radioClass: 'iradio_square-green',
+            });
+			
+			
+			$("#classifiationForm").validate({
+				onkeyup: false,
+				rules : {
+					name: {
+						required: true,
+						minlength: 10
+					},
+					regDate: {
+						required: true,
+						validRegDate: true
+					}
+				}, messages: {
+					name: {
+						required: "프로젝트명을 입력하세요.",
+						minlength: $.validator.format("프로젝트명은 최소 {0} 글자 이상 입력하세요.")
+					},
+					regDate: {
+						required: "생성일자를 입력하세요.",
+						validRegDate: "날자형식이 정확하지 않습니다."
+					}
+				}, submitHandler: function(form) {
+					var data = $(form).serializeArray();
+					$(form).find('input[type=checkbox]').each(function (id, item) {
+						var item_value = $(item).is(":checked") ? 1 : 0;
+			            var item_name = $(item).attr('name');
+						$(data).each(function(i, v) {
+							if (v.name == item_name) {
+								data[i].value = item_value;
+							}
+						});
+					});
+					patentFormSubmit(/*[[@{'/project/insertPorject'}]]*/, data, 
+						function (res) {
+							$("#createProjectModal").modal("toggle");
+							$(".modal-backdrop").hide();
+							var obj = JSON.parse(res.message);
+							
+							myTimeout(projectViewPage(obj.id));
+						},
+						function () {
+							$("#classifiationForm").validate().showErrors({"name": "프로젝트 등록에 실패했습니다."});
+						}
+					);
+				}
+			});
+			
+		});
+		
+		function projectViewPage(id) {
+			patentMovePage(/*[[@{/project/step1}]]*/, 0, 0, {'id': id});
+		}
+		function projectView(url, id, sts) {
+			var data = {'id':id, sts:sts};
+			patentMovePage(url, 0, 0, data);
+		}
+	</script>
+</body>
+</html>

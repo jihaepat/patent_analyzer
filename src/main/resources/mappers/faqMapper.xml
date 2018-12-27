@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!--/////////////////////////////////////////////////////////////////////////////
+//
+//(c)2003-2017 ITS-I Inc. All Rights Reserved.
+//
+//THIS SOURCE FILE IS THE PROPERTY OF ITS-I Inc. AND IS NOT TO BE
+//RE-DISTRIBUTED BY ANY MEANS WHATSOEVER WITHOUT THE EXPRESSED
+//WRITTEN CONSENT OF ITS-I Inc.
+//
+//CONTACT INFORMATION:
+//support@its-i.co.kr
+//http://www.its-i.co.kr
+//
+/////////////////////////////////////////////////////////////////////////////-->
+
+<mapper namespace="com.patent.dao.mapper.FaqMapper">
+	
+	<select id="getTotalSize" resultType="Integer">
+		SELECT COUNT(*) FROM TB_FAQ
+	</select>
+	
+	<select id="getList" resultType="com.patent.web.faq.domain.Faq">
+		SELECT id, question, answer FROM TB_FAQ ORDER BY id DESC LIMIT #{onepagelstcnt} OFFSET #{offset}
+	</select>
+	
+	<insert id="question">
+		<selectKey keyProperty ="id" resultType="Integer" order="BEFORE">
+			SELECT	nextval('SEQ_FAQ');
+		</selectKey>
+		
+		INSERT INTO	TB_FAQ
+					(id, question, question_reg_dt)
+		VALUES		(#{id}, #{question}, NOW())
+	</insert>
+	
+	<update id="updateQuestion">
+		UPDATE	TB_FAQ
+		SET		question = #{question}
+		WHERE	id = #{id}
+	</update>
+	
+	<update id="answer">
+		UPDATE	TB_FAQ
+		SET		answer = #{answer},
+				answer_reg_dt = NOW()
+		WHERE	id = #{id}
+	</update>
+	
+	<delete id="delete">
+		DELETE FROM	TB_FAQ
+		WHERE		id = #{id}
+	</delete>
+	
+</mapper>

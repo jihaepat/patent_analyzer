@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+
+<!--/////////////////////////////////////////////////////////////////////////////
+//
+//(c)2003-2018 ITS-I Inc. All Rights Reserved.
+//
+//THIS SOURCE FILE IS THE PROPERTY OF ITS-I Inc. AND IS NOT TO BE
+//RE-DISTRIBUTED BY ANY MEANS WHATSOEVER WITHOUT THE EXPRESSED
+//WRITTEN CONSENT OF ITS-I Inc.
+//
+//CONTACT INFORMATION:
+//support@its-i.co.kr
+//http://www.its-i.co.kr
+//
+/////////////////////////////////////////////////////////////////////////////-->
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+</head>
+
+<style layout:fragment="pageStyle" type="text/css">
+.filebox label { display: inline-block; padding: .5em .75em; color: #999; font-size: inherit; line-height: normal; vertical-align: middle; background-color: #fdfdfd; cursor: pointer; border: 1px solid #ebebeb; border-bottom-color: #e2e2e2; border-radius: .25em; } 
+.filebox input[type="file"] { /* 파일 필드 숨기기 */ position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip:rect(0,0,0,0); border: 0; }
+.modal-body {padding: 0px;}
+</style>
+
+<body>
+
+	<div class="row" layout:fragment="mainContent">
+		<div class="ibox float-e-margins">
+			<div class="ibox-content">
+				<div id="wizard" role="application" class="wizard clearfix">
+					<div class="steps clearfix" th:include="fragments/project :: menu"></div>
+					
+					<div th:include="fragments/project :: form1"></div>
+					
+					<div id="duplicatePatent"></div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="modal inmodal fade my_modal" id="classificationModal" tabindex="-1" role="dialog" aria-hidden="true" data-keyboard="false" data-backdrop="false">
+	        <div class="modal-dialog modal-lg">
+	            <div class="modal-content" style="width: 1000px;">
+	                <div class="modal-header">
+	                    <button type="button" class="close" data-dismiss="modal">
+	                        <span aria-hidden="true">&times;</span>
+	                        <span class="sr-only">Close</span>
+	                    </button>
+	                    <h4 class="modal-title" id="title">기술 분류 편집</h4>
+	                </div>
+	                
+	                <div class="modal-body">
+                		<div class="ibox float-e-margins" style="margin-bottom: 0px;">
+							<div class="ibox-content" style="padding-bottom: 0px;">
+								<div class="row">
+									<div class="col-lg-5" style="height: 507px !important; overflow-y: auto !important;">
+										<div id="classificationList"></div>
+									</div>
+									<div class="col-lg-7" style="height: 507px !important; overflow-y: auto !important;">
+										<div class="row">
+											<div class="ibox float-e-margins" style="margin-bottom: 0px;">
+												<form id="classifiationForm" class="form-horizontal">
+													<input type="hidden" id="parentId" name="parentId" />
+													<input type="hidden" id="currentId" name="currentId" />
+													<input type="hidden" id="dept" name="dept" />
+													
+													<div class="ibox-title">
+														<h5>기술 분류 정보</h5>
+													</div>
+													<div class="ibox-content" style="padding-bottom: 0px;">
+														<div class="form-group">
+															<label class="col-sm-3 control-label">프로젝트 명</label>
+															<div class="col-sm-9">
+																<input type="text" class="form-control" id="projectName" readonly />
+															</div>
+														</div>
+														<div class="form-group dept1st">
+															<label class="col-sm-3 control-label">1st 분류</label>
+															<div class="col-sm-9">
+																<input type="text" class="form-control" name="classification_v1" id="classification_v1" tabIndex="1" />
+																<label id="classification_v1-error" class="error form_error" for="classification_v1"></label>
+															</div>
+														</div>
+														<div class="form-group dept2nd">
+															<label class="col-sm-3 control-label">2nd 분류</label>
+															<div class="col-sm-9">
+																<input type="text" class="form-control" name="classification_v2" id="classification_v2" tabIndex="2" />
+																<label id="classification_v2-error" class="error form_error" for="classification_v2"></label>	
+															</div>
+														</div>
+														<div class="form-group dept3th">
+															<label class="col-sm-3 control-label">3th 분류</label>
+															<div class="col-sm-9">
+																<input type="text" class="form-control" name="classification_v3" id="classification_v3" tabIndex="3" />
+																<label id="classification_v3-error" class="error form_error" for="classification_v3"></label>	
+															</div>
+														</div>
+														<div class="form-group dept0ro">
+															<label class="col-sm-3 control-label">코드</label>
+															<div class="col-sm-9">
+																<input type="text" class="form-control" name="code" id="code" tabIndex="4" />
+																<label id="classification_v3-error" class="error form_error" for="code"></label>	
+															</div>
+														</div>
+														<div class="form-group deptinfo">
+															<label class="col-sm-3 control-label">검색식</label>
+															<div class="col-sm-9">
+																<textarea rows="5" cols="" class="form-control" style="resize: none;background: #fff;" name="search" id="search" tabIndex="4"></textarea>
+																<label id="classification_v3-error" class="error form_error" for="search"></label>	
+															</div>
+														</div>
+														<div class="form-group deptinfo">
+															<label class="col-sm-3 control-label">검색 설명</label>
+															<div class="col-sm-9">
+																<textarea rows="5" cols="" class="form-control" style="resize: none;background: #fff;" name="remarks" id="remarks" tabIndex="5"></textarea>
+																<label id="classification_v3-error" class="error form_error" for="remarks"></label>	
+															</div>
+														</div>
+														<div class="form-group deptinfo">
+															<label class="col-sm-3 control-label">파일</label>
+															<div class="col-sm-9">
+																<input type="text" class="form-control tagsinput" name="display" id="display" tabIndex="6" readonly="readonly" />
+																<div style="padding-top: 5px;">
+																	<button type="button" class="btn btn-primary btn_right btnFileSelect" onclick="javascript:clickFile();">파일</button>
+																</div>
+																<div id="divFile" data-id="0" style="display: none;"></div>
+																<input type="hidden" name="deleteFileId" id="deleteFileId" />	
+															</div>
+														</div>
+													</div>
+												</form>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+		                </div>
+	                </div>
+	                
+                    <div class="modal-footer">
+                    	<button type="button" id="btnSubmitClassification" class="btn btn-primary btn_right" onclick="javascript:submitClassification();" style="margin-left: 10px" tabIndex="7" >적용</button>
+										<button type="button" id="btnDeleteClassification" class="btn btn-white btn_right" onclick="javascript:deleteClassification();" style="margin-left: 10px" >삭제</button>
+                    
+                    	<button type="button" id="btnNewClassification" class="btn btn-white btn_left" onclick="javascript:newClassification();">신규 분류</button>
+                    </div>
+	            </div>
+	        </div>
+	    </div>
+	    
+	    <div class="modal inmodal fade" id="duplicateModal" tabindex="-1" role="dialog" aria-hidden="true" data-keyboard="false" data-backdrop="false">
+	        <div class="modal-dialog modal-lg patent_modal">
+	            <div class="modal-content">
+	                <div class="modal-header">
+	                    <h4 class="modal-title" id="title">기술 분류 편집</h4>
+	                </div>
+	                
+	                <div class="modal-body">
+                		<div class="ibox float-e-margins duplicate-ibox">
+							<div class="ibox-content">
+								<div class="row select_pop_body" id="duplicatePatentDiv" ></div>
+							</div>
+		                </div>
+	                </div>
+	                
+					<div class="modal-footer">
+						<button type="button" id="btnNewClassification" class="btn btn-primary" onclick="javascript:setDuplicateClassification();">선택 적용</button>
+					</div>
+				</div>
+			</div>
+	    </div>
+		
+		<form class="hidden" name="download" method="POST" th:action="@{/project/downloadExcel/1}">
+            <input type="text" name="id" th:value="${projectId}" />
+        </form>
+	</div>
+	
+	
+
+	<script layout:fragment="pageScript" th:inline="javascript">
+		var defaultClassification = /*[[${projectinfo.classification}]]*/
+		var defaultStatus = /*[[${projectinfo.status}]]*/
+		$(document).ready(function() {
+			eventSpinner();
+			$("#duplicateModal").on("shown.bs.modal", function () {
+				closedSpinner();
+			});
+			
+			if (defaultStatus == 2) {
+				$("#btnForm1Next").show();
+			}
+			$('.input-group.date').datepicker({
+                todayBtn: "linked",
+                keyboardNavigation: false,
+                forceParse: false,
+                calendarWeeks: true,
+                autoclose: true
+            });
+
+			$('.i-checks').iCheck({
+                checkboxClass: 'icheckbox_square-green',
+                radioClass: 'iradio_square-green',
+            });
+			
+			loadClassificationInfo();
+			$("#classificationModal").on('hide.bs.modal', function () {
+				loadClassificationInfo();
+				if (defaultStatus == 2) {
+					loadDuplicatePatent();
+				}
+			});
+			
+			if (defaultStatus == 2) {
+				loadDuplicatePatent();
+			}
+			
+			$("#project_step1").validate({
+				onkeyup: false,
+				rules : {
+					name: {
+						required: true,
+						minlength: 10
+					},
+					regDate: {
+						required: true,
+						validRegDate: true
+					}
+				}, messages: {
+					name: {
+						required: "프로젝트명을 입력하세요.",
+						minlength: $.validator.format("프로젝트명은 최소 {0} 글자 이상 입력하세요.")
+					},
+					regDate: {
+						required: "생성일자를 입력하세요.",
+						validRegDate: "날자형식이 정확하지 않습니다."
+					}
+				}, submitHandler: function(form) {
+					var isGood = 1;
+					
+					if ($(".classification_form_file_div").length == 0) {
+						showModal('classificationModal');
+						isGood = 0;
+					} else {
+						$(".classification_form_file_div").each(function (i, v) {
+							if ($(v).find(".label-info").length == 0) {
+								var item = $("#"+$(v).find("label").attr("id"));
+								item.html("파일이 필요합니다.");
+								item.show();
+								
+								isGood = 0;
+							}
+						});						
+					}
+					
+					if (isGood == 1) {
+						var message = swalMessage(defaultStatus, 1);
+						sweetsubmit({text:message}, function() {
+							loadSpinner();
+							$("#duplicatePatent").html("");
+							
+							patentFormSubmit(/*[[@{'/project/step1/updateStep1'}]]*/, $(form).serialize(), 
+								function (res) {
+									closedSpinner();
+									myInterval(saveSuccess);
+								},
+								function () {
+									closedSpinner();
+									myInterval(saveFail);
+								}
+							);
+						});
+					}
+				}
+			});
+			
+			$("#btnForm1Next").click(function() {
+				var data = new FormData();
+				data.append("id", /*[[${projectId}]]*/);
+				patentFormDataSubmit(/*[[@{'/project/step1/finish'}]]*/, data,
+					function (res) {
+						patentMovePage(/*[[@{/project/step2}]]*/, 0, 0, {"id":/*[[${projectId}]]*/});
+					},
+					function () {
+						sweetalert("저장에 실패했습니다.", "error");
+					}
+				);
+			});
+		});
+		
+		function myInterval(func) {
+			var loadValues = setInterval(function() {
+				func();
+				clearInterval(loadValues)
+			}, 500);			
+		}
+		function saveSuccess() {
+			sweetalert("저장에 성공했습니다.", "success", function() {
+				$("#btnForm1Next").show();
+				showDuplicateModal();
+			});
+		}
+		function saveFail() {
+			sweetalert("저장에 실패했습니다.", "error");
+		}
+		
+		var fileModify = false;
+		$(document).delegate(':file', 'change', function( e ) {
+			var ids = $(this).attr("id").split("_");
+			$("#display").tagsinput('add', { id: 'df_'+ids[1], label: this.files[0].name});
+			fileModify = true;
+		});
+		function clickFile() {
+			var dataid = $("#divFile").attr('data-id')*1;
+			$("#divFile").attr('data-id', dataid + 1);
+			
+			var fileid = "file_"+dataid;
+			$("#divFile").append("<input type='file' id='"+fileid+"' accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' />");
+			$("#"+fileid).click();
+		}
+		
+		function loadClassificationInfo() {
+			loadSubPage("classificationInfoStep1", /*[[@{/project/step1/classificationInfo}]]*/, {id:/*[[${projectId}]]*/, di: defaultClassification}, function() {
+				$(".table .tagsinput").tagsinput({allowDuplicates: false, itemValue: 'id', itemText: 'label'});
+				$(".bootstrap-tagsinput > input").prop("readonly", true);
+				
+				$(".div_file_tagsinput").each(function (i, v) {
+					var id = "txtFileTagsinput"+$(v).attr("id").replace("divFileTagsinput", "");
+					if ($(v).html()) {
+						var obj = JSON.parse($(v).html());
+						$(obj).each(function (i, v) {
+							$("#"+id).tagsinput('add', { id: 'odf_'+v.id, label: v.orgname});
+						});	
+					}
+				});
+				
+				$(".table .label-info > span").remove();
+				$(".table .tagsinput").on('beforeItemRemove', function(event) {
+					event.cancel = true;
+				});
+			});
+		}
+		
+		function showModal(id) {
+			if ($("#classification").val()*1 != defaultClassification) {
+				sweetconfirm("이전 기술 분류 내용이 전체 삭제 됩니다. 기술 분류를 다시 작행해야 합니다. 계속하시겠습니까?", null, 
+					function() {
+						patentFormSubmit(/*[[@{'/project/step1/deleteAllClassification'}]]*/, {id: /*[[${projectId}]]*/, dept: $("#classification").val()}, 
+							function (res) {
+								defaultClassification = $("#classification").val();
+			        			initModal(id);
+							},
+							function () {
+								sweetalert("저장에 실패했습니다.", "error");
+							}
+						);
+					},
+					function () {
+						 $("#classification").val(defaultClassification);
+					}
+				);
+			} else {
+				initModal(id);
+			}
+		}
+		
+		function initModal(id) {
+			$(".dept0ro").hide();
+			$(".dept1st").hide();
+			$(".dept2nd").hide();
+			$(".dept3th").hide();
+			$(".deptinfo").hide();
+
+			$("#projectName").val($("#name").val());
+			
+			loadSubPage("classificationList", /*[[@{'/project/step1/classificationTable'}]]*/, {id: /*[[${projectId}]]*/}, function() {
+				$("#display").tagsinput({allowDuplicates: false, itemValue: 'id', itemText: 'label'});
+				$("#display").val("");
+				$(".bootstrap-tagsinput > input").prop("readonly", true);
+				$("#display").on('beforeItemAdd', function(event) {
+					var item = event.item;
+					var items = $("#display").tagsinput("items");
+					if (items.length > 0) {
+						$(items).each(function(i,v) {
+							if (item.label == v.label) {
+								event.cancel = true;
+								$("#file_" + event.item.id.replace("df_", "")).remove();
+								
+								sweetalert("같은 이름의 파일이 존재합니다.", "warning");
+							}
+						});	
+					}
+				});
+				$("#display").on('beforeItemRemove', function(event) {
+					fileModify = true;
+					if (event.item.id.search("odf_") == 0) {
+						$("#deleteFileId").val(($("#deleteFileId").val() != "" ? $("#deleteFileId").val() + ", " : "") + event.item.id.replace("odf_", ""));
+					} else {
+						$("#file_" + event.item.id.replace("df_", "")).remove();						
+					}
+					
+				});
+				
+				setClassification(0);
+				$("#-1").find('div').first().addClass("project_nestable_active");
+				myTimeout(function() {$("#"+id).modal("show")});
+			});
+		}
+		
+		function closedClassification() {
+			$("#classificationModal").modal("hide");
+		}
+		
+		function clearClassification() {
+			$("#classifiationForm").validate().resetForm();
+			$("#classifiationForm").find(".form-control").removeClass("error");
+			
+			$("#display").tagsinput("removeAll");
+			$("#display").val("");
+			$("#divFile").attr('data-id', 0);
+			$("#divFile").html("");
+			
+			$("#deleteFileId").val("");
+			$("#code").val("");
+			
+			allClearForm("classifiationForm");
+			$("#dept").val(0);
+			$("#projectName").val($("#name").val());
+		}
+		
+		function btnToggle(n, d, i) {
+			if (n) {
+				$("#btnNewClassification").show();
+			} else {
+				$("#btnNewClassification").hide();
+			}
+			
+			if (d) {
+				$("#btnDeleteClassification").show();
+			} else {
+				$("#btnDeleteClassification").hide();
+			}
+			
+			if (i) {
+				$(".deptinfo").show();
+			} else {
+				$(".deptinfo").hide();
+			}
+		}
+		
+		function setClassification(dept, v1, v2, v3) {
+			clearClassification();
+			
+			$("#classification_v1").prop( "disabled", false);
+			$("#classification_v2").prop( "disabled", false);
+			
+			$('#nestable .project_nestable_active').removeClass('project_nestable_active');
+			if (v3) {
+				$("#"+v3).find('div').first().addClass("project_nestable_active");
+			} else if (v2) {
+				$("#"+v2).find('div').first().addClass("project_nestable_active");
+			} else {
+				$("#"+v1).find('div').first().addClass("project_nestable_active");
+			}
+			
+			if (dept == 0) {
+				$(".dept0ro").hide();
+				$(".dept1st").hide();
+				$(".dept2nd").hide();
+				$(".dept3th").hide();
+				
+				$("#currentId").val(-1);
+				$("#parentId").val(-1);
+			} else {
+				$(".dept0ro").show();
+				$(".dept1st").show();
+				if (v1 != -1) {
+					$("#btnDeleteClassification").show();
+					$("#currentId").val(v1);
+					$("#parentId").val(-1);
+					
+					if (v2) {
+						$(".dept2nd").show();
+						$("#classification_v1").prop( "disabled", true);
+						$("#classification_v1").val($("#"+v1).find(".editableName").html());
+						$("#parentId").val(v1);
+						$("#currentId").val(v2);
+					} else {
+						$(".dept2nd").hide();
+						$("#classification_v2").val(null);
+					}
+					
+					if (v3) {
+						$(".dept3th").show();
+						$("#classification_v2").prop( "disabled", true);
+						$("#classification_v2").val($("#"+v2).find(".editableName").html());
+						$("#parentId").val(v2);
+						$("#currentId").val(v3);
+					} else {
+						$(".dept3th").hide();
+						$("#classification_v3").val(null);
+					}
+				} else {
+					$("#classification_v1").val("");
+					$("#currentId").val("");
+					$("#parentId").val("");
+					
+					$(".dept2nd").hide();
+					$("#classification_v2").val(null);
+					$(".dept3th").hide();
+					$("#classification_v3").val(null);
+				}
+			}
+			
+			$("#dept").val(dept);
+			var formDept = $("#classification").val();
+			btnToggle(dept != formDept, dept != 0, dept == formDept);
+			
+			if (dept != 0) {
+				var formId = (dept == 1 ? v1 : (dept == 2 ? v2 : v3));
+				patentFormSubmit(/*[[@{'/project/step1/getClassification'}]]*/, {id: formId},
+					function (res) {
+						var obj = res.message;
+						$("#classification_v"+dept).val(obj.name);
+						$("#code").val(obj.code);
+						
+						if (formDept == dept) {
+		        			$("#search").val(obj.search);
+		        			$("#remarks").val(obj.remarks);
+		        			
+		        			$(obj.files).each(function (i, v) {
+		        				$("#display").tagsinput('add', { id: 'odf_'+v.id, label: v.orgname});
+// 		        				if (v.orgname) {
+// 		        					if (v.orgname.length > 48) {
+// 		        						$("#display").tagsinput('add', { id: 'odf_'+v.id, label: v.orgname.substring(0, 45) + ""});
+// 		        					} else {
+// 		        						$("#display").tagsinput('add', { id: 'odf_'+v.id, label: v.orgname});
+// 		        					}
+// 		        				}
+		        			});
+						}
+					},
+					function () {
+						sweetalert("저장에 실패했습니다.", "error");
+					}
+				);	
+			}
+		}
+		
+		function newClassification() {
+			var formDept = $("#classification").val();
+			var parentId = $("#parentId").val();
+			var currentId = $("#currentId").val();
+			
+			$(".dept0ro").show();
+			if (parentId == -1 && currentId == -1) {
+				$(".dept1st").show();
+				$("#classification_v1").val('');
+			} else if (parentId == -1 && currentId != -1) { 
+				$("#classification_v1").prop( "disabled", true);
+				$("#classification_v1").val($("#"+currentId).find("span").html());
+				$(".dept2nd").show();
+				$("#classification_v2").val('');
+			} else {
+				$("#classification_v1").prop( "disabled", true);
+				$("#classification_v2").prop( "disabled", true);
+				$("#classification_v2").val($("#"+currentId).find("span").html());
+				$(".dept2nd").show();
+				$(".dept3th").show();
+				$("#classification_v3").val('');
+			}
+			
+			var dept = $("#dept").val()*1+1;
+			var formDept = $("#classification").val();
+			btnToggle(0, 0, dept == formDept);
+			
+			$("#parentId").val(currentId);
+			$("#currentId").val("");
+			$("#code").val("");
+		}
+		
+		function submitClassification() {
+			var currentTxt, errTxt;
+			if (!$("#classification_v1").prop( "disabled" )) {
+				currentTxt = "classification_v1";
+				if (!$("#classification_v1").val()) {
+					errTxt = "classification_v1";	
+				}
+					
+			} else if (!$("#classification_v2").prop( "disabled" )) {
+				currentTxt = "classification_v2";
+				if (!$("#classification_v2").val()) {
+					errTxt = "classification_v1";
+				}
+			} else if (!$("#classification_v3").prop( "disabled" )) {
+				currentTxt = "classification_v3";
+				if (!$("#classification_v3").val()) {
+					errTxt = "classification_v1";
+				}
+			}
+			
+			var data=new Object();
+			if (!$("#code").val()) {
+				data["code"]="입력하십시오.";
+			}
+			if (errTxt) {
+				data[errTxt]="입력하십시오.";
+			} 
+			$("#classifiationForm").validate().showErrors(data);
+			if ($("#classifiationForm").validate().errorList.length == 0){
+				if ($("#classifiationForm").has(".form-control.error").length == 0) {
+					sweetsubmit({text:'저장하시겠습니까?'}, function () {
+						var data = new FormData();
+						data.append("projectId", /*[[${projectId}]]*/);
+						data.append("parentId", $("#parentId").val());
+						data.append("id", $("#currentId").val());
+						data.append("name", $("#"+currentTxt).val());
+						data.append("code", $("#code").val());
+						data.append("search", $("#search").val());
+						data.append("remarks", $("#remarks").val());
+						data.append("deleteFiles", $("#deleteFileId").val());
+						data.append("dept", $("#dept").val());
+						
+						$("#classifiationForm :file").each(function(i, v) {
+		 					if ($(this).attr("id")) {
+		 				    	data.append("fiels"+i, $(this)[0].files[0]);
+		 				    }
+		 				});
+						
+						if (fileModify)
+							$("#btnForm1Next").hide();
+						
+						patentFormFileSubmit(/*[[@{'/project/step1/insertClassification'}]]*/, data,
+							function (res) {
+								var obj = JSON.parse(res);
+								sweetalert("저장에 성공했습니다.", "success", function() {
+			        				clearClassification();
+			        				
+			        				loadSubPage("classificationList", /*[[@{'/project/step1/classificationTable'}]]*/, {id: /*[[${projectId}]]*/}, function() {
+			        					myTimeout(function(){
+				        					var objMessage = JSON.parse(obj.message);
+				        					$(".project_nestable_active").removeClass("project_nestable_active");
+					        				$("#"+objMessage.id).find('div').first().addClass("project_nestable_active");
+	
+					        				if ($(".project_nestable_active")[0]) {
+					        					$(".project_nestable_active")[0].click();
+					        				}
+				        				});
+			        				});
+			        			});
+							},
+							function () {
+								sweetalert("저장에 실패했습니다.", "error");
+							}
+						);
+					});
+				}
+			}
+		}
+		
+		function deleteClassification() {
+			sweetsubmit({text:"삭제하시겠습니까?", confirmButtonText:"삭제"}, function () {
+				fileModify = true;
+				$("#btnForm1Next").hide();
+				
+				var data = new FormData();
+				data.append("projectId", /*[[${projectId}]]*/);
+				data.append("parentId", $("#parentId").val());
+				data.append("id", $("#currentId").val());
+				
+				patentFormDataSubmit(/*[[@{'/project/step1/deleteClassification'}]]*/, data,
+					function (res) {
+						sweetalert("삭제에 성공했습니다.", "success", function() {
+	        				clearClassification();
+	        				
+	        				loadSubPage("classificationList", /*[[@{'/project/step1/classificationTable'}]]*/, {id: /*[[${projectId}]]*/}, function() {
+		        				myTimeout(function(){
+		        					setClassification(0);
+		        					$("#-1").find('div').first().addClass("project_nestable_active");
+		        				});
+		        			});
+	        			});
+					},
+					function () {
+						sweetalert("삭제에 실패했습니다.", "error");
+					}
+				);
+			});
+		}
+		
+		function setDuplicateClassification() {
+			sweetsubmit({text:"적용하시겠습니까?", confirmButtonText:"적용"}, function () {
+				var data = new FormData();
+				data.append("projectId", /*[[${projectId}]]*/);
+				$("#duplicatePatentDiv").find("input.i-checks").each(function (i, v) {
+					if ($(this).attr("name").indexOf("All") == -1) {
+						if ($(this).is(':unchecked')) {
+							data.append("arr[]", $(this).attr("value"));
+						}	
+					}
+				});
+
+				patentFormDataSubmit(/*[[@{'/project/step1/updateDuplicateAppnm'}]]*/, data,
+					function (res) {
+						sweetalert("적용에 성공했습니다.", "success", function() {
+							loadDuplicatePatent();
+	        			});
+					},
+					function () {
+						sweetalert("적용에 실패했습니다.", "error");
+					}
+				);
+				
+				$("#duplicateModal").modal("hide");
+			});
+		}
+		
+		function initTable() {
+// 			var table = $('#dataList').DataTable({
+// 				'dom': 'Rlfrtip',
+// 				pageResize: true, 
+// 				paging: false,
+// 				searching: false,
+// 				fixedColumns: false,
+// 				info: false,
+// 				"columnDefs": [
+// 					{ "orderable": false, "targets": 0 },
+// 					{ "orderable": false, "targets": 3 },
+// 					{ "orderable": false, "targets": 4 },
+// 					{ "orderable": false, "targets": 5 }
+// 				]
+// 			}).order( [ 1, 'desc' ] ).draw();
+		}
+		
+		function loadDuplicatePatent() {
+			loadSubPage("duplicatePatent", /*[[@{'/project/step1/getDuplicatePatent'}]]*/, {id:/*[[${projectId}]]*/}, function() {
+				loadList(0);
+			});
+		}
+		
+		function loadList(page) {
+			loadListPage("duplicatePatentList", /*[[@{'/project/step1/getDuplicatePatentList'}]]*/, {id:/*[[${projectId}]]*/,page:page,limit:$("#searchLimit").val(),search:$("#searchVal").val()}, initTable);	
+		}
+		
+		function showDuplicateModal() {
+			loadSpinner();
+			
+			loadSubPage("duplicatePatentDiv", /*[[@{/project/step1/checkDuplicateAppnm}]]*/, {id:/*[[${projectId}]]*/}, function(i, v, x) {
+				$('.i-checks').iCheck({
+	                checkboxClass: 'icheckbox_square-green',
+	                radioClass: 'iradio_square-green'
+				}).on("ifChanged", function(event) {
+					if ($(this).attr("name").indexOf("All") == -1) {
+						var name = $(this).attr("name");
+						if (event.target.checked) {
+							var isChecked = true;
+							$('input[name="'+name+'"]').each(function (i, v) {
+								isChecked = isChecked && $(this).is(':checked');
+							});
+							
+							if (isChecked) {
+								$('input[name="All'+name+'"]').prop('checked', true).iCheck('update');
+							}
+						} else {
+							$('input[name="All'+name+'"]').removeAttr('checked').iCheck('update');
+						}
+					} else {
+						var name = $(this).attr("name").replace("All", "");
+						if (event.target.checked) {
+							$('input[name="'+name+'"]').each(function (i, v) {
+								$(this).prop('checked', true).iCheck('update');
+							});
+						} else {
+							$('input[name="'+name+'"]').each(function (i, v) {
+								$(this).removeAttr('checked').iCheck('update');
+							});
+						}
+					}
+				});
+
+				if ($("#duplicatePatentDiv input.i-checks").length > 0) {
+					$("#duplicateModal").modal("show");
+				} else {
+					myTimeout(function() {
+						var data = new FormData();
+						data.append("projectId", /*[[${projectId}]]*/);
+						patentFormDataSubmit(/*[[@{'/project/step1/updateDuplicateAppnm'}]]*/, data,
+							function (res) {
+								closedSpinner();
+								loadDuplicatePatent();
+							},
+							function () {
+								closedSpinner();
+								sweetalert("적용에 실패했습니다.", "error");
+							}
+						);
+					}, 300);
+				}
+			});
+		}
+
+		function downExcelAction() {
+			downExcel(/*[[@{'/project/downloadExcel/'} + ${projectId} + '/1']]*/, $("#searchVal").val());
+		}
+	</script>
+
+</body>
+</html>

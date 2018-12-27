@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+
+<!--/////////////////////////////////////////////////////////////////////////////
+//
+//(c)2003-2017 ITS-I Inc. All Rights Reserved.
+//
+//THIS SOURCE FILE IS THE PROPERTY OF ITS-I Inc. AND IS NOT TO BE
+//RE-DISTRIBUTED BY ANY MEANS WHATSOEVER WITHOUT THE EXPRESSED
+//WRITTEN CONSENT OF ITS-I Inc.
+//
+//CONTACT INFORMATION:
+//support@its-i.co.kr
+//http://www.its-i.co.kr
+//
+/////////////////////////////////////////////////////////////////////////////-->
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+<body>
+	<div th:fragment="topmenu">
+		<nav class="navbar navbar-default navbar-static-top" role="navigation">
+			<div class="navbar-header">
+				<a th:href="@{/main}" class="navbar-brand">특허분석플랫폼</a>
+			</div>
+			<div class="navbar-collapse collapse" id="navbar">
+				<ul class="nav navbar-nav">
+					<li th:id="home" class="active">
+						<a aria-expanded="false" role="button" href="javascript:void(0);" th:onclick="'javascript:patentMovePage(\''+@{/sub}+'\', 0, \'home\', null, true);'"> 홈</a>
+					</li>
+					<li th:id="project" th:if="${session.patent_login_session}">
+						<a aria-expanded="false" role="button" href="javascript:void(0);" th:onclick="'javascript:patentMovePage(\''+@{/project}+'\', 0, \'project\', null, true);'">My Page</a>
+					</li>
+					<li th:id="guide">
+						<a aria-expanded="false" role="button" href="javascript:void(0);" th:onclick="'javascript:patentMovePage(\''+@{/guide}+'\', 0, \'guide\', null, true);'"> 가이드</a>
+					</li>
+					<li th:id="faq">
+						<a aria-expanded="false" role="button" href="javascript:void(0);" th:onclick="'javascript:patentMovePage(\''+@{/faq}+'\', 0, \'faq\', null, true);'"> FAQ</a>
+					</li>
+					<li th:id="manager" th:if="${session.patent_login_session} ? ${session.patent_login_session.member.grade} == 10">
+						<a aria-expanded="false" role="button" href="javascript:void(0);" th:onclick="'javascript:patentMovePage(\''+@{/manager}+'\', 0, \'manager\', null, true);'"> 플랫폼 관리</a>
+					</li>
+				</ul>
+				<ul class="nav navbar-top-links navbar-right">
+					<li th:if="${session.patent_login_session}">
+						<a href="javascript:viewAccountPop(-1);" th:text="${session.patent_login_session.member.name}"></a>
+					</li>
+					<li th:if="${session.patent_login_session}">
+						<a href="javascript:void(0);" th:onclick="'javascript:patentMovePage(\''+@{/logout}+'\', 1);'"> <i class="fa fa-sign-out"></i>Log out</a>
+					</li>
+					<li th:unless="${session.patent_login_session}">
+						<a href="javascript:void(0);" th:onclick="'javascript:patentMovePage(\''+@{/login}+'\');'"> <i class="fa fa-sign-in"></i>Log in</a>
+					</li>
+				</ul>
+			</div>
+		</nav>
+	</div>
+</body>
+</html>
+				

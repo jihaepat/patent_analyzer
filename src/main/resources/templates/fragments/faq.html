@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+
+<!--/////////////////////////////////////////////////////////////////////////////
+//
+//(c)2003-2017 ITS-I Inc. All Rights Reserved.
+//
+//THIS SOURCE FILE IS THE PROPERTY OF ITS-I Inc. AND IS NOT TO BE
+//RE-DISTRIBUTED BY ANY MEANS WHATSOEVER WITHOUT THE EXPRESSED
+//WRITTEN CONSENT OF ITS-I Inc.
+//
+//CONTACT INFORMATION:
+//support@its-i.co.kr
+//http://www.its-i.co.kr
+//
+/////////////////////////////////////////////////////////////////////////////-->
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+<body>
+	<div th:fragment="faq">
+	
+		<div class="faq-item" th:each="faq : ${list}">
+			<div class="row">
+				<div class="col-md-12" th:if="${faq.answer}">
+					<a data-toggle="collapse" th:id="'itemFaq'+${faq.id}" th:href="'#Faq'+${faq.id}" class="faq-question">
+						<span th:text="${faq.question}"></span>
+					</a>
+				</div>
+				<div class="col-md-12" th:unless="${faq.answer}">
+					<a th:if="${session.patent_login_session}" href="javascript:void(0);" 
+						th:onclick="${session.patent_login_session.member.grade} == 10 ? 'javascript:showAnswer(\''+${faq.id}+'\');' : ''" class="faq-question">
+						<span th:text="${faq.question}"></span>
+					</a>
+					<a th:unless="${session.patent_login_session}" href="javascript:void(0);" class="faq-question">
+						<span th:text="${faq.question}"></span>
+					</a>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-12">
+					<div th:id="'Faq'+${faq.id}" class="panel-collapse collapse">
+						<div class="faq-answer">
+							<p th:text="${faq.answer}"></p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div th:include="fragments/pageable :: pageable"></div>
+				
+	</div>
+	
+</body>
+</html>

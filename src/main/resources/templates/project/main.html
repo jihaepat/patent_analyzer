@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+
+<!--/////////////////////////////////////////////////////////////////////////////
+//
+//(c)2003-2018 ITS-I Inc. All Rights Reserved.
+//
+//THIS SOURCE FILE IS THE PROPERTY OF ITS-I Inc. AND IS NOT TO BE
+//RE-DISTRIBUTED BY ANY MEANS WHATSOEVER WITHOUT THE EXPRESSED
+//WRITTEN CONSENT OF ITS-I Inc.
+//
+//CONTACT INFORMATION:
+//support@its-i.co.kr
+//http://www.its-i.co.kr
+//
+/////////////////////////////////////////////////////////////////////////////-->
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+</head>
+
+<style layout:fragment="pageStyle" type="text/css">
+#dataList tr {
+	cursor: pointer;
+}
+</style>
+
+<body>
+
+	<div class="row" layout:fragment="mainContent">
+		<div class="col-lg-12 patent_head">
+			<div class="ibox float-e-margins">
+				<div class="ibox-title">
+					<h5>특허 분석 이력</h5>
+				</div>
+				<div class="ibox-content">
+				    <div id="projectList"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<script layout:fragment="pageScript" th:inline="javascript">
+		
+		$(document).ready(function() {
+			loadList(0);
+		});
+		
+		function initTable() {
+// 			var table = $('#dataList').DataTable({
+// 				'dom': 'Rlfrtip',
+// 				pageResize: true, 
+// 				paging: false,
+// 				searching: false,
+// 				fixedColumns: false,
+// 				info: false
+// 			}).order( [ 0, 'desc' ] ).draw();
+		}
+		
+		function loadList(page) {
+			loadListPage("projectList", /*[[@{'/project/list'}]]*/, {"page":page}, initTable);
+		}
+		
+		function projectViewPage(id) {
+			patentMovePage(/*[[@{/project/step}]]*/, 0, 0, {'id': id});
+		}
+		
+	</script>
+
+</body>
+</html>

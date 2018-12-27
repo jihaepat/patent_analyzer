@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!--/////////////////////////////////////////////////////////////////////////////
+//
+//(c)2003-2017 ITS-I Inc. All Rights Reserved.
+//
+//THIS SOURCE FILE IS THE PROPERTY OF ITS-I Inc. AND IS NOT TO BE
+//RE-DISTRIBUTED BY ANY MEANS WHATSOEVER WITHOUT THE EXPRESSED
+//WRITTEN CONSENT OF ITS-I Inc.
+//
+//CONTACT INFORMATION:
+//support@its-i.co.kr
+//http://www.its-i.co.kr
+//
+/////////////////////////////////////////////////////////////////////////////-->
+
+<mapper namespace="com.patent.dao.mapper.MemberMapper">
+
+	<select id="getMemberListSize" resultType="Integer">
+		SELECT COUNT(*) FROM TB_MEMBER
+	</select>
+	
+	<select id="getMemberList" resultType="com.patent.web.member.domain.Member">
+		SELECT id, usrid, name, mailaddr, phone, grade, TO_CHAR(regdt, 'yyyy-MM-dd') AS regdt, ROW_NUMBER () OVER (ORDER BY id ASC) AS rownum 
+		FROM TB_MEMBER ORDER BY id DESC LIMIT #{onepagelstcnt} OFFSET #{offset}
+	</select>
+	
+	<select id="getMember" resultType="com.patent.web.member.domain.Member">
+		SELECT id, usrid, CASE WHEN usrpass = ENCODE(ENCRYPT(CONVERT_TO(#{usrpass}, 'utf8'), 'ENC_KEY', 'aes'), 'hex') THEN 1 ELSE 0 END AS usrpass, name, position, mailaddr, phone, grade 
+		FROM TB_MEMBER WHERE usrid = #{usrid}
+	</select>
+	
+	<select id="getMemberById" resultType="com.patent.web.member.domain.Member">
+		SELECT id, usrid, name, position, mailaddr, phone, grade
+		FROM TB_MEMBER WHERE id = #{id}
+	</select>
+	
+	<select id="insertCheckIdMember" resultType="Integer">
+		SELECT COUNT(*) FROM TB_MEMBER WHERE usrid = #{data}
+	</select>
+
+	<insert id="insertMember">
+		<selectKey keyProperty ="id" resultType="Integer" order="BEFORE">
+			SELECT	nextval('SEQ_MEMBER');
+		</selectKey>
+		
+		INSERT INTO		TB_MEMBER
+						(id, usrid, usrpass, name, position, mailaddr, phone, regdt, grade)
+		VALUES			(#{id}, #{usrid}, ENCODE(ENCRYPT(CONVERT_TO(#{usrpass}, 'utf8'), 'ENC_KEY', 'aes'), 'hex'), #{name}, #{position}, #{mailaddr}, #{phone}, NOW(), 0)
+	</insert>
+	
+	<update id="updateMember">
+		UPDATE	TB_MEMBER
+		SET		position = #{position},
+				mailaddr = #{mailaddr},
+				phone = #{phone}
+				<if test="grade!=null and !grade.equals('')">
+					,grade = #{grade}
+				</if>
+				<if test="usrpass!=null and !usrpass.equals('')">
+					,usrpass = ENCODE(ENCRYPT(CONVERT_TO(#{usrpass}, 'utf8'), 'ENC_KEY', 'aes'), 'hex')
+				</if>
+		WHERE	id = #{id}
+	</update>
+
+</mapper>

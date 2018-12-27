@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+
+<!--/////////////////////////////////////////////////////////////////////////////
+//
+//(c)2003-2017 ITS-I Inc. All Rights Reserved.
+//
+//THIS SOURCE FILE IS THE PROPERTY OF ITS-I Inc. AND IS NOT TO BE
+//RE-DISTRIBUTED BY ANY MEANS WHATSOEVER WITHOUT THE EXPRESSED
+//WRITTEN CONSENT OF ITS-I Inc.
+//
+//CONTACT INFORMATION:
+//support@its-i.co.kr
+//http://www.its-i.co.kr
+//
+/////////////////////////////////////////////////////////////////////////////-->
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+<body>
+	<div th:fragment="pageable">
+
+		<ul class="pagination pull-right">
+			<li class="footable-page-arrow" th:classappend="${pageable?.frstpage <= pageable?.pagegroup} ? 'disabled'">
+				<a href="javascript:void(0);" th:onclick="${pageable?.frstpage > pageable?.pagegroup} ? 'javascript:loadList(1)'">«</a>
+			</li>
+			<li class="footable-page-arrow" th:classappend="${pageable?.frstpage <= pageable?.pagegroup} ? 'disabled'">
+				<a href="javascript:void(0);" th:onclick="${pageable?.frstpage > pageable?.pagegroup} ? 'javascript:loadList(\''+${pageable?.frstpage-pageable?.pagegroup}+'\')'">...</a>
+			</li>
+			<li class="footable-page-arrow" th:classappend="${pageable?.page == 1} ? 'disabled'">
+				<a href="javascript:void(0);" th:onclick="${pageable?.page != 1} ? 'javascript:loadList(\''+${pageable?.page-1}+'\')'">‹</a>
+			</li>
+			
+			<li class="footable-page" th:classappend="${page == pageable?.page} ? 'active'" th:each="page : ${#numbers.sequence( {pageable?.frstpage}, {pageable?.lastpage})}">
+				<a href="javascript:void(0);" th:onclick="${page == pageable?.page} ? 'javascript:void();' : 'javascript:loadList(\''+${page}+'\')'"><span th:text="${page}">1</span></a>
+			</li>
+			
+			<li class="footable-page-arrow" th:classappend="${pageable?.page == pageable?.totalpage} ? 'disabled'">
+				<a href="javascript:void(0);" th:onclick="${pageable?.page != pageable?.totalpage} ? 'javascript:loadList(\''+${pageable?.page+1}+'\')'">›</a>
+			</li>
+			<li class="footable-page-arrow" th:classappend="${pageable?.frstpage > pageable?.totalpage-pageable?.pagegroup} ? 'disabled'">
+				<a href="javascript:void(0);" th:onclick="${pageable?.frstpage <= pageable?.totalpage-pageable?.pagegroup} ? 'javascript:loadList(\''+${pageable?.frstpage+pageable?.pagegroup}+'\')'">...</a>
+			</li>
+			<li class="footable-page-arrow" th:classappend="${pageable?.frstpage > pageable?.totalpage-pageable?.pagegroup} ? 'disabled'">
+				<a href="javascript:void(0);" th:onclick="${pageable?.frstpage <= pageable?.totalpage-pageable?.pagegroup} ? 'javascript:loadList(\''+${pageable?.totalpage}+'\')'">»</a>
+			</li>
+		</ul>
+		
+	</div>
+</body>
+</html>

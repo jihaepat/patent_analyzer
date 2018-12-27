@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
+	<link th:href="@{'/css/bootstrap.css'}" rel="stylesheet" />
+	<link th:href="@{'/font-awesome/css/font-awesome.css'}" rel="stylesheet" />
+	
+	<link th:href="@{'/css/plugins/steps/jquery.steps.css'}" rel="stylesheet">
+	<link th:href="@{'/css/plugins/dataTables/datatables.min.css'}" rel="stylesheet">
+	<link th:href="@{'/css/animate.css'}" rel="stylesheet" />
+	
+	<link th:href="@{'/css/plugins/ionRangeSlider/ion.rangeSlider.css'}" rel="stylesheet" />
+    <link th:href="@{'/css/plugins/ionRangeSlider/ion.rangeSlider.skinNice.css'}" rel="stylesheet" />
+    
+	<link th:href="@{'/css/plugins/datapicker/datepicker3.css'}" rel="stylesheet" />
+	<link th:href="@{'/css/plugins/iCheck/custom.css'}" rel="stylesheet" />
+	<link th:href="@{'/css/plugins/tagsinput/bootstrap-tagsinput.css'}" rel="stylesheet" />
+
+	<link th:href="@{'/css/plugins/slick/slick.css'}" rel="stylesheet" />
+    <link th:href="@{'/css/plugins/slick/slick-theme.css'}" rel="stylesheet" />
+    <link th:href="@{'/css/animate.css'}" rel="stylesheet" />
+	
+	<link th:href="@{'css/plugins/toastr/toastr.min.css'}" rel="stylesheet" />
+	
+	<link th:href="@{'/css/plugins/sweetalert/sweetalert.css'}" rel="stylesheet" />
+	<link th:href="@{'/css/style.css'}" rel="stylesheet" />
+	
+	<style layout:fragment="pageStyle" type="text/css">
+	.main_body_outer {
+		position: absolute;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		top:0;left:0;right:0;bottom:0;
+		overflow:hidden;
+	}
+	.main_body {
+		max-width: 1210px;
+		border-left: solid 2px #ccc;
+		border-right: solid 2px #ccc;
+		overflow:hidden !important;
+	}
+	.main_content_cs {
+		height: calc(100vh - 70px);
+		min-height: 500px;
+		overflow-y: auto;
+	}
+	#page-wrapper {padding: 0;}
+	.container {padding: 0;}
+	.row {margin-right:0px;margin-left:0px;}
+    </style>
+</head>
+<body class="top-navigation main_body">
+<div class="main_body_outer">
+	<div id="wrapper" class="main_body">
+		<div id="page-wrapper" class="gray-bg" >
+			<div class="border-bottom white-bg">
+				<div layout:fragment="topmenu">
+				</div>
+			</div>
+
+			<div class="wrapper wrapper-content main_content_cs">
+				<div class="container">
+					<div layout:fragment="mainContent" id="mainContent">
+					</div>
+				</div>
+			</div>
+	
+			<div class="footer">
+				<div>
+					<strong>Copyright</strong> 지해솔루션 &copy; 2018
+				</div>
+			</div>
+		</div>
+		
+		<div class="modal-backdrop fade in" style="display: none;"></div>
+		<div class="modal inmodal fade" id="spinnerModal" tabindex="-1" role="dialog" aria-hidden="true" data-keyboard="false" data-backdrop="false">
+	        <div class="modal-dialog modal-lg" style="width:150px;top:35%;">
+	            <div class="modal-content" style="border: 3px solid #1bb394;">
+	            	<div class="row" style="padding: 20px 0px">
+	            		<div class="sk-spinner sk-spinner-wave">
+							<div class="sk-rect1"></div>
+							<div class="sk-rect2"></div>
+							<div class="sk-rect3"></div>
+							<div class="sk-rect4"></div>
+							<div class="sk-rect5"></div>
+							<div class="sk-rect6"></div>
+							<div class="sk-rect7"></div>
+							<div class="sk-rect8"></div>
+							<div class="sk-rect9"></div>
+							<div class="sk-rect10"></div>
+						</div>
+	            	</div>
+					<div id="spinnerContent" style="text-align: center;font-size: 20px;font-weight: bold;padding-bottom: 10px;"></div>
+				</div>
+			</div>		
+		</div>
+		
+		<div id="myAccountInfo"></div>
+
+	</div>
+
+	<script th:src="@{'/js/jquery-2.1.1.js'}" charset="utf-8"></script>
+	<script th:src="@{'/js/bootstrap.min.js'}" charset="utf-8"></script>
+	<script th:src="@{'/js/plugins/metisMenu/jquery.metisMenu.js'}" charset="utf-8"></script>
+	<script th:src="@{'/js/plugins/slimscroll/jquery.slimscroll.min.js'}" charset="utf-8"></script>
+	
+	<script th:src="@{'/js/plugins/pace/pace.min.js'}" charset="utf-8"></script>
+	<script th:src="@{'/js/plugins/datapicker/bootstrap-datepicker.js'}" charset="utf-8"></script>
+	<script th:src="@{'/js/plugins/ionRangeSlider/ion.rangeSlider.min.js'}" charset="utf-8"></script>
+	
+	<script th:src="@{'/js/plugins/validate/jquery.validate.min.js'}" charset="utf-8"></script>
+	<script th:src="@{'/js/plugins/dataTables/datatables.min.js'}" charset="utf-8"></script>
+	<script th:src="@{'/js/plugins/dataTables/ColReorderWithResize.js'}" charset="utf-8"></script>
+	<script th:src="@{'/js/plugins/iCheck/icheck.min.js'}" charset="utf-8"></script>
+	<script th:src="@{'/js/plugins/nestable/jquery.nestable.js'}" charset="utf-8"></script>
+	<script th:src="@{'/js/plugins/tagsinput/bootstrap-tagsinput.js'}" charset="utf-8"></script>
+	
+	<script th:src="@{'/js/plugins/toastr/toastr.min.js'}" charset="utf-8"></script>
+	<script th:src="@{'/js/plugins/sweetalert/sweetalert.js'}" charset="utf-8"></script>
+	
+	<script th:src="@{'/js/inspinia.js'}" charset="utf-8"></script>
+	<script th:src="@{'/js/patent.js'}" charset="utf-8"></script>
+	
+	<script th:src="@{'/js/jquery.fileDownload.js'}" charset="utf-8"></script>
+	
+	<script th:src="@{'/js/clipboard.js'}" charset="utf-8"></script>
+	<script th:src="@{'/js/chartjs.js'}" charset="utf-8"></script>
+	<script th:src="@{'/js/chartjs_datatables.js'}" charset="utf-8"></script>
+	<script th:src="@{'/js/makeChart.js'}" charset="utf-8"></script>
+
+	<script layout:fragment="pageScript" type="text/javascript">
+    </script>
+</div>
+</body>
+</html>

@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+
+<!--/////////////////////////////////////////////////////////////////////////////
+//
+//(c)2003-2018 ITS-I Inc. All Rights Reserved.
+//
+//THIS SOURCE FILE IS THE PROPERTY OF ITS-I Inc. AND IS NOT TO BE
+//RE-DISTRIBUTED BY ANY MEANS WHATSOEVER WITHOUT THE EXPRESSED
+//WRITTEN CONSENT OF ITS-I Inc.
+//
+//CONTACT INFORMATION:
+//support@its-i.co.kr
+//http://www.its-i.co.kr
+//
+/////////////////////////////////////////////////////////////////////////////-->
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+</head>
+
+
+<style layout:fragment="pageStyle" type="text/css">
+.filebox label {
+	display: inline-block;
+	padding: .5em .75em;
+	color: #999;
+	font-size: inherit;
+	line-height: normal;
+	vertical-align: middle;
+	background-color: #fdfdfd;
+	cursor: pointer;
+	border: 1px solid #ebebeb;
+	border-bottom-color: #e2e2e2;
+	border-radius: .25em;
+}
+
+.filebox input[type="file"] { /* 파일 필드 숨기기 */
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	border: 0;
+}
+
+.modal-body {
+	padding: 0px;
+}
+
+.title {
+	font-weight: bold;
+}
+
+.control-label-content {
+	text-align: left !important;
+}
+
+.form-control-tt {
+	background-color: #FFFFFF;
+	background-image: none;
+	border: 1px solid #e5e6e7;
+	border-radius: 1px;
+	color: inherit;
+	display: inline-block;
+	padding: 6px 12px;
+	transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s
+		ease-in-out 0s;
+	width: 100px;
+	font-size: 14px;
+}
+
+input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button
+	{
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+	margin: 0;
+}
+
+canvas{width:1000px !important;
+/*   width:1000px !important; height:600px !important; */
+}
+
+#chartArea {width:1000px !important;}
+</style>
+
+<body>
+	<div layout:fragment="mainContent">
+		<div class="ibox float-e-margins">
+			<div class="ibox-content">
+				<div id="wizard" role="application" class="wizard clearfix">
+					<div class="steps clearfix" th:include="fragments/project :: menu"></div>
+
+					<div>
+						<div class="col-lg-12">
+							<form id="project_step5" name="project_step5" method="post"
+								class="form-horizontal">
+								<input type="hidden" name="id" th:value="${projectinfo.id}">
+								<div class="float-e-margins">
+									<div class="ibox-title">
+										<h5>통계 분석 및 리포팅 설정</h5>
+										<div class="ibox-tools">
+											<button type="submit" class="btn btn-primary"
+												id="btnForm5Save">저장</button>
+											<button type="button" class="btn btn-primary"
+												id="btnForm5Down">다운로드</button>
+										</div>
+									</div>
+								</div>
+								<div class="ibox-content project_form_content">
+
+									<h3 class="title">국가별 특허 동향</h3>
+									<div class="panel panel-default">
+										<div class="panel-heading">주요 출원국 연도별 특허 동향</div>
+										<div class="panel-body">
+											<div class="form-group">
+												<label class="col-sm-5 control-label">연도별 주요 출원국 출원
+													건수 <a href="javascript:void(0);" class="clibpardBtn"
+													data-clipboard-text="$$$$IPT1$$$">[Copy to CODE]</a>
+												</label>
+												<div class="col-sm-7">
+													<select class="form-control" name="ipt1" id="ipt1">
+														<option value="0" th:selected="(${projectinfo.ipt1 == 0})">막대스택</option>
+														<option value="1" th:selected="(${projectinfo.ipt1 == 1})">Area</option>
+													</select>
+												</div>
+											</div>
+											<div class="form-group">
+												<label class="col-sm-5 control-label">주요 출원국 비율 <a
+													href="javascript:void(0);" class="clibpardBtn"
+													data-clipboard-text="$$$$IPT2$$$">[Copy to CODE]</a></label>
+												<div class="col-sm-7 control-label control-label-content">
+													파이</div>
+											</div>
+											<div class="form-group">
+												<label class="col-sm-5 control-label">주요 출원국 연도별 특허
+													동향 <a href="javascript:void(0);" class="clibpardBtn"
+													data-clipboard-text="$$$$IPT3$$$">[Copy to CODE]</a>
+												</label>
+												<div class="col-sm-7 control-label control-label-content">
+													복합(막대, 꺽은선)</div>
+											</div>
+										</div>
+									</div>
+
+									<div class="panel panel-default">
+										<div class="panel-heading">주요 출원국 내/외국인 특허 출원 현황</div>
+										<div class="panel-body">
+											<div class="form-group">
+												<label class="col-sm-5 control-label">출원국 주요 출원국 비율
+													<a href="javascript:void(0);" class="clibpardBtn"
+													data-clipboard-text="$$$$IPT4$$$">[Copy to CODE]</a>
+												</label>
+												<div class="col-sm-7 control-label control-label-content">
+													파이</div>
+											</div>
+											<div class="form-group">
+												<label class="col-sm-5 control-label">주요 출원국 내/외국인
+													출원 비율 <a href="javascript:void(0);" class="clibpardBtn"
+													data-clipboard-text="$$$$IPT5$$$">[Copy to CODE]</a>
+												</label>
+												<div class="col-sm-7 control-label control-label-content">
+													파이</div>
+											</div>
+											<div class="form-group">
+												<label class="col-sm-5 control-label">주요 출원국 외국인 국적
+													비율 <a href="javascript:void(0);" class="clibpardBtn"
+													data-clipboard-text="$$$$IPT6$$$">[Copy to CODE]</a>
+												</label>
+												<div class="col-sm-7 control-label control-label-content">
+													파이</div>
+											</div>
+											<div class="form-group">
+												<label class="col-sm-5 control-label">주요 출원국 연도별
+													내/외국인 출원 동황 <a href="javascript:void(0);"
+													class="clibpardBtn" data-clipboard-text="$$$$IPT7$$$">[Copy
+														to CODE]</a>
+												</label>
+												<div class="col-sm-7 control-label control-label-content">
+													복합(막대, 꺽은선)</div>
+											</div>
+										</div>
+									</div>
+
+									<div class="panel panel-default">
+										<div class="panel-heading">
+											기술 성장 단계 (포트폴리오 분석): <select name="ipt31" id="ipt31"
+												class="form-control form-control-tt"><option
+													value="0" th:selected="(${projectinfo.ipt31 == 0})">금년포함</option>
+												<option value="1" th:selected="(${projectinfo.ipt31 == 1})">금년미포함</select>
+											총 <input name="ipt2" id="ipt2" class="form-control-tt"
+												th:value="${projectinfo.ipt2}" />구간, 구간의 기간은 <input
+												name="ipt3" id="ipt3" class="form-control-tt"
+												th:value="${projectinfo.ipt3}" />년 <span id="ipt3period"></span>
+										</div>
+										<div class="panel-body">
+											<div class="form-group">
+												<label class="col-sm-5 control-label">전체 주요 출원국의 기술
+													성장 단계 <a href="javascript:void(0);" class="clibpardBtn"
+													data-clipboard-text="$$$$IPT8$$$">[Copy to CODE]</a>
+												</label>
+												<div class="col-sm-7 control-label control-label-content">
+													버블</div>
+											</div>
+											<div class="form-group">
+												<label class="col-sm-5 control-label">주요 출원국 기술 성장
+													단계 <a href="javascript:void(0);" class="clibpardBtn"
+													data-clipboard-text="$$$$IPT9$$$">[Copy to CODE]</a>
+												</label>
+												<div class="col-sm-7 control-label control-label-content">
+													버블</div>
+											</div>
+										</div>
+									</div>
+
+									<div class="hr-line-dashed"></div>
+									<h3 class="title">기술 분류별 특허 동향</h3>
+									<div class="panel panel-default">
+										<div class="panel-heading">세부 기술별 출원 비율</div>
+										<div class="panel-body">
+											<div class="form-group">
+												<label class="col-sm-5 control-label">전체 주요 출원국의 세부
+													기술 출원 비율 <a href="javascript:void(0);" class="clibpardBtn"
+													data-clipboard-text="$$$$IPT10$$$">[Copy to CODE]</a>
+												</label>
+												<div class="col-sm-7 control-label control-label-content">
+													파이</div>
+											</div>
+											<div class="form-group">
+												<label class="col-sm-5 control-label">주요 출원국 세부 기술
+													출원 비율 <a href="javascript:void(0);" class="clibpardBtn"
+													data-clipboard-text="$$$$IPT11$$$">[Copy to CODE]</a>
+												</label>
+												<div class="col-sm-7 control-label control-label-content">
+													파이</div>
+											</div>
+										</div>
+									</div>
+
+									<div class="panel panel-default">
+										<div class="panel-heading">세부 기술의 연도별 출원 동향</div>
+										<div class="panel-body">
+											<div class="form-group">
+												<label class="col-sm-5 control-label">전체 세부 기술의 연도별
+													출원 동향 <a href="javascript:void(0);" class="clibpardBtn"
+													data-clipboard-text="$$$$IPT12$$$">[Copy to CODE]</a>
+												</label>
+												<div class="col-sm-7">
+													<select class="form-control" name="ipt4" id="ipt4">
+														<option value="0" th:selected="(${projectinfo.ipt4 == 0})">막대스택</option>
+														<option value="1" th:selected="(${projectinfo.ipt4 == 1})">Area</option>
+													</select>
+												</div>
+											</div>
+											<div class="form-group">
+												<label class="col-sm-5 control-label">세부 기술 분류의 연도별
+													출원 동향 <a href="javascript:void(0);" class="clibpardBtn"
+													data-clipboard-text="$$$$IPT13$$$">[Copy to CODE]</a>
+												</label>
+												<div class="col-sm-7 control-label control-label-content">
+													복합(막대, 꺽은선)</div>
+											</div>
+										</div>
+									</div>
+
+									<div class="panel panel-default">
+										<div class="panel-heading">
+											세부 기술 점유율 분석 : <select name="ipt61" id="ipt61"
+												class="form-control form-control-tt"><option
+													value="0" th:selected="(${projectinfo.ipt31 == 0})">금년포함</option>
+												<option value="1" th:selected="(${projectinfo.ipt31 == 1})">금년미포함</select>
+											총 <input name="ipt5" id="ipt5" class="form-control-tt"
+												th:value="${projectinfo.ipt5}" />구간, 구간의 기간은 <input
+												type="text" pattern="^[0-9]" name="ipt6" id="ipt6"
+												class="form-control-tt" th:value="${projectinfo.ipt6}" /> 년
+											<span id="ipt6period"></span>
+										</div>
+										<div class="panel-body">
+											<div class="form-group">
+												<label class="col-sm-5 control-label">시간 구간별 세부 기술
+													분류 점유율 비율 <a href="javascript:void(0);" class="clibpardBtn"
+													data-clipboard-text="$$$$IPT14$$$">[Copy to CODE]</a>
+												</label>
+												<div class="col-sm-7 control-label control-label-content">
+													파이</div>
+											</div>
+											<div class="form-group">
+												<label class="col-sm-5 control-label">시간 구간별 세부 기술
+													분류 점유율 동향 <a href="javascript:void(0);" class="clibpardBtn"
+													data-clipboard-text="$$$$IPT15$$$">[Copy to CODE]</a>
+												</label>
+												<div class="col-sm-7 control-label control-label-content">
+													Area</div>
+											</div>
+										</div>
+									</div>
+
+									<div class="panel panel-default">
+										<div class="panel-heading">세부 기술별 주요 출원국 비율</div>
+										<div class="panel-body">
+											<div class="form-group">
+												<label class="col-sm-5 control-label">세부 기술별 주요 출원국
+													구성 비율 <a href="javascript:void(0);" class="clibpardBtn"
+													data-clipboard-text="$$$$IPT16$$$">[Copy to CODE]</a>
+												</label>
+												<div class="col-sm-7 control-label control-label-content">
+													파이</div>
+											</div>
+										</div>
+									</div>
+
+									<div class="hr-line-dashed"></div>
+									<h3 class="title">출원인 분석</h3>
+									<div class="panel panel-default">
+										<div class="panel-heading">
+											경쟁자 Landscape : <input name="ipt7" id="ipt7"
+												class="form-control-tt" th:value="${projectinfo.ipt7}" />건
+											이상 출원한 출원인 대상
+										</div>
+										<div class="panel-body">
+											<div class="form-group">
+												<label class="col-sm-5 control-label">주요 출원인의 국가별 출원
+													통계 및 주력 기술 분야 <a href="javascript:void(0);"
+													class="clibpardBtn" data-clipboard-text="$$$$IPT17$$$">[Copy
+														to CODE]</a>
+												</label>
+												<div class="col-sm-7 control-label control-label-content">
+													테이블</div>
+											</div>
+										</div>
+									</div>
+
+									<div class="panel panel-default">
+										<div class="panel-heading">
+											주요 출원인별 출원 건수 : 총 출원 건수 상위 <input name="ipt8" id="ipt8"
+												class="form-control-tt" th:value="${projectinfo.ipt8}" />명을
+											대상
+										</div>
+										<div class="panel-body">
+											<div class="form-group">
+												<label class="col-sm-5 control-label">주요 출원인 출원 건수 <a
+													href="javascript:void(0);" class="clibpardBtn"
+													data-clipboard-text="$$$$IPT18$$$">[Copy to CODE]</a></label>
+												<div class="col-sm-7 control-label control-label-content">
+													가로 막대</div>
+											</div>
+											<div class="form-group">
+												<label class="col-sm-5 control-label">주요 출원인 삼극 특허
+													보유 현황 <a href="javascript:void(0);" class="clibpardBtn"
+													data-clipboard-text="$$$$IPT19$$$">[Copy to CODE]</a>
+												</label>
+												<div class="col-sm-7 control-label control-label-content">
+													가로 막대 스택</div>
+											</div>
+										</div>
+									</div>
+
+									<div class="panel panel-default">
+										<div class="panel-heading">
+											국가별 기술별 주요 출원인 : 총 출원 건수 상위 <input name="ipt9" id="ipt9"
+												class="form-control-tt" th:value="${projectinfo.ipt9}" />명을
+											대상
+										</div>
+										<div class="panel-body">
+											<div class="form-group">
+												<label class="col-sm-5 control-label">국가별 주요 출원인 출원
+													건수 <a href="javascript:void(0);" class="clibpardBtn"
+													data-clipboard-text="$$$$IPT20$$$">[Copy to CODE]</a>
+												</label>
+												<div class="col-sm-7 control-label control-label-content">
+													가로 막대</div>
+											</div>
+											<div class="form-group">
+												<label class="col-sm-5 control-label">세부 길술별 주요 출원인
+													출원 건수 <a href="javascript:void(0);" class="clibpardBtn"
+													data-clipboard-text="$$$$IPT21$$$">[Copy to CODE]</a>
+												</label>
+												<div class="col-sm-7 control-label control-label-content">
+													가로 막대</div>
+											</div>
+										</div>
+									</div>
+
+									<div class="panel panel-default">
+										<div class="panel-heading">보고서 탬플릿 업로드</div>
+										<div class="panel-body">
+											<div class="form-group"
+												th:if="${projectinfo.orgName} and ${projectinfo.orgName != ''}">
+												<label class="col-sm-12 control-label control-label-content">등록
+													템플릿:<span id="projectorgname"
+													th:text="${projectinfo.orgName}"></span>
+												</label>
+											</div>
+											<div class="form-group">
+												<div class="col-sm-12">
+													<input type="file" name="tmpFl" id="tmpFl"
+														class="form-control" accept=".doc, .docx" />
+												</div>
+											</div>
+										</div>
+									</div>
+
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id="chartArea">
+		</div>
+	</div>
+
+
+
+	<script layout:fragment="pageScript" th:inline="javascript">
+		var timeoutflag;
+		var total = /*[[${dtinfo}]]*/;
+		var $fileInput = $('#tmpFl');
+
+		$(document).ready(function() {
+			$("#chartArea").hide();
+			eventSpinner();
+			
+			$("#project_step5").validate({
+				onkeyup: false,
+				rules : {
+				}, messages: {
+				}, submitHandler: function(form) {
+					var message = swalMessage(defaultStatus, 9);
+					sweetsubmit({text:message}, function() {
+						loadSpinner();
+						
+						var data = new FormData();
+						data.append("projectId", /*[[${projectId}]]*/);
+						data.append("ipt1", $("#ipt1").val());
+						if ($.isNumeric($("#ipt2").val())) {
+							data.append("ipt2", $("#ipt2").val());	
+						} else {
+							data.append("ipt2", 0);
+						}
+						if ($.isNumeric($("#ipt3").val())) {
+							data.append("ipt3", $("#ipt3").val());
+						} else {
+							data.append("ipt3", 0);
+						}
+						data.append("ipt31", $("#ipt31").val());
+						data.append("ipt4", $("#ipt4").val());
+						if ($.isNumeric($("#ipt5").val())) {
+							data.append("ipt5", $("#ipt5").val());
+						} else {
+							data.append("ipt5", 0);
+						}
+						if ($.isNumeric($("#ipt6").val())) {
+							data.append("ipt6", $("#ipt6").val());
+						} else {
+							data.append("ipt6", 0);
+						}
+						data.append("ipt61", $("#ipt61").val());
+						data.append("ipt7", $("#ipt7").val());
+						data.append("ipt8", $("#ipt8").val());
+						data.append("ipt9", $("#ipt9").val());
+						data.append("ipt10", $("#ipt10").val());
+						data.append("tmpFl", $("#tmpFl")[0].files[0]);
+						
+						patentFormFileSubmit(/*[[@{'/project/updateStep5'}]]*/, data, 
+							function (res) {
+								var obj = JSON.parse(res);
+								if (obj.result) {
+									if (obj.message) {
+										$("#projectorgname").html(obj.message);
+									}
+									makeChart();										
+									
+// 									closedSpinner();
+// 									clearFileInput($fileInput);
+// 									sweetalert("저장에 성공했습니다.", "success", function() {});	
+								}
+							},
+							function () {
+								closedSpinner();
+								sweetalert("저장에 실패했습니다.", "error");
+							}
+						);
+					});
+				}
+			});
+			
+			$("#ipt3").keyup(function() {
+				clearTimeout(timeoutflag);
+				timeoutflag = setTimeout(function() {
+					calcPeriod("ipt3");
+				}, 500);
+			});
+			$("#ipt6").keyup(function() {
+				clearTimeout(timeoutflag);
+				timeoutflag = setTimeout(function() {
+					calcPeriod("ipt6");
+				}, 500);
+			});
+			
+			$("#btnForm5Down").click(function() {
+				downExcel(/*[[@{/project/updateStep5/download/} + ${projectId}]]*/);
+			});
+			
+			calcPeriod("ipt3");
+			calcPeriod("ipt6");
+			
+			var clipboard = new Clipboard('.clibpardBtn');
+		});
+		
+		function calcPeriod(id) {
+			var dInput = $("#"+id).val()*1;
+			if ($.isNumeric(dInput) && dInput > 0) {
+				var tmp = Math.floor(total/dInput);
+				if (total % dInput != 0) {
+					tmp+=1;
+				}
+				$("#"+id+"period").html("(최대 구간:"+tmp+")");	
+			} else {
+				$("#"+id+"period").html("");
+			}
+		}
+		
+		 $(function () {
+            var i = -1;
+            var toastCount = 0;
+            var $toastlast;
+            var getMessage = function () {
+                var msg = 'Hi, welcome to Inspinia. This is example of Toastr notification box.';
+                return msg;
+            };
+
+            $('#showsimple').click(function (){
+                toastr.success('Without any options','Simple notification!')
+            });
+            $('.clibpardBtn').click(function () {
+                var toastIndex = toastCount++;
+
+                toastr.options = {
+                    closeButton: $('#closeButton').prop('checked'),
+                    debug: $('#debugInfo').prop('checked'),
+                    progressBar: $('#progressBar').prop('checked'),
+                    preventDuplicates: $('#preventDuplicates').prop('checked'),
+                    positionClass: $('#positionGroup input:radio:checked').val() || 'toast-top-right',
+                    onclick: null,
+                    showDuration: 300,
+                    hideDuration: 1000,
+                    timeOut: 7000,
+                    extendedTimeOut: 1000,
+                    hideEasing: 'linear',
+                    showEasing: 'linear',
+                    showMethod: 'slideDown',
+                    hideMethod: 'slideUp'
+                };
+                
+                $("#toastrOptions").text("Command: toastr[success](\"복사\")\n\ntoastr.options = "+ JSON.stringify(toastr.options, null, 2));
+                var $toast = toastr["success"]("복사합니다.", "복사");
+                $toastlast = $toast;
+                if ($toast.find('#okBtn').length) {
+                    $toast.delegate('#okBtn', 'click', function () {
+                        alert('you clicked me. i was toast #' + toastIndex + '. goodbye!');
+                        $toast.remove();
+                    });
+                }
+                if ($toast.find('#surpriseBtn').length) {
+                    $toast.delegate('#surpriseBtn', 'click', function () {
+                        alert('Surprise! you clicked me. i was toast #' + toastIndex + '. You could perform an action here.');
+                    });
+                }
+            });
+        });
+		  
+		function clearFileInput($input) {
+		    if ($input.val() == '') {
+		        return;
+		    }
+		    if (/MSIE/.test(navigator.userAgent)) {
+		        var $frm1 = $input.closest('form');
+		        if ($frm1.length) {
+		            $input.wrap('<form>');
+		            var $frm2 = $input.closest('form'),
+		                $tmpEl = $(document.createElement('div'));
+		            $frm2.before($tmpEl).after($frm1).trigger('reset');
+		            $input.unwrap().appendTo($tmpEl).unwrap();
+		        } else {
+		            $input.wrap('<form>').closest('form').trigger('reset').unwrap();
+		        }   
+		    } else {
+		        $input.val('');
+		    }
+		}
+
+		function makeChart() {
+			$("#chartArea").html("");
+			$("#chartArea").show();
+			
+			var image1 = getChartInfo("chartArea", '1', (($("#ipt1").val() == 0)? "stack":"area"), /*[[@{'/project/step5/getchart1/'}+${projectId}]]*/);
+			var image2 = getChartInfo("chartArea", '2', 'pie', /*[[@{'/project/step5/getchart2/'}+${projectId}]]*/);
+			var image3 = getChartInfo("chartArea", '3', "mix", /*[[@{'/project/step5/getchart3/'}+${projectId}]]*/);
+
+			var image4 = getChartInfo("chartArea", '4', 'pie', /*[[@{'/project/step5/getchart4/'}+${projectId}]]*/);
+			var image5 = getChartInfo("chartArea", '5', 'pie', /*[[@{'/project/step5/getchart5/'}+${projectId}]]*/);
+			var image6 = getChartInfo("chartArea", '6', 'pie', /*[[@{'/project/step5/getchart6/'}+${projectId}]]*/);
+			var image7 = getChartInfo("chartArea", '7', "mix", /*[[@{'/project/step5/getchart7/'}+${projectId}]]*/);
+
+			var image8 = getChartInfo("chartArea", '8', "bubble", /*[[@{'/project/step5/getchart8/'}+${projectId}]]*/);
+			var image9 = getChartInfo("chartArea", '9', "bubble", /*[[@{'/project/step5/getchart9/'}+${projectId}]]*/);
+
+			var image10 = getChartInfo("chartArea", '10', 'pie', /*[[@{'/project/step5/getchart10/'}+${projectId}]]*/);
+			var image11 = getChartInfo("chartArea", '11', 'pie', /*[[@{'/project/step5/getchart11/'}+${projectId}]]*/);
+
+			var image12 = getChartInfo("chartArea", '12', (($("#ipt4").val() == 0)? "stack":"area"), /*[[@{'/project/step5/getchart12/'}+${projectId}]]*/);
+			var image13 = getChartInfo("chartArea", '13', 'mix2', /*[[@{'/project/step5/getchart13/'}+${projectId}]]*/);
+
+			var image14 = getChartInfo("chartArea", '14', 'pie', /*[[@{'/project/step5/getchart14/'}+${projectId}]]*/);
+			var image15 = getChartInfo("chartArea", '15', 'area', /*[[@{'/project/step5/getchart15/'}+${projectId}]]*/);
+
+			var image16 = getChartInfo("chartArea", '16', 'pie', /*[[@{'/project/step5/getchart16/'}+${projectId}]]*/);
+
+			var image18 = getChartInfo("chartArea", '18', 'horizontal', /*[[@{'/project/step5/getchart18/'}+${projectId}]]*/);
+			var image19 = getChartInfo("chartArea", '19', 'horizontalStack', /*[[@{'/project/step5/getchart19/'}+${projectId}]]*/);
+
+			var image20 = getChartInfo("chartArea", '20', 'horizontal', /*[[@{'/project/step5/getchart20/'}+${projectId}]]*/);
+			var image21 = getChartInfo("chartArea", '21', 'horizontal', /*[[@{'/project/step5/getchart21/'}+${projectId}]]*/);
+
+			var data = new FormData();
+			data.append("id", /*[[${projectId}]]*/);
+			setData(1, data, image1);
+			setData(2, data, image2);
+			setData(3, data, image3);
+			setData(4, data, image4);
+			setData(5, data, image5);
+			setData(6, data, image6);
+			setData(7, data, image7);
+			setData(8, data, image8);
+			setData(9, data, image9);
+			setData(10, data, image10);
+			setData(11, data, image11);
+			setData(12, data, image12);
+			setData(13, data, image13);
+			setData(14, data, image14);
+			setData(15, data, image15);
+			setData(16, data, image16);
+			setData(18, data, image18);
+			setData(19, data, image19);
+			setData(20, data, image20);
+			setData(21, data, image21);
+			
+			patentFormFileSubmit(/*[[@{'/project/step5/updateImage'}]]*/, data,
+				function (res) {
+			    	closedSpinner();
+			    	sweetalert("저장에 성공했습니다.", "success", function() {});
+				},
+				function () {
+					sweetalert("저장에 실패했습니다.", "error");
+				}
+			);
+			
+			$("#chartArea").hide();
+	    	clearFileInput($fileInput);	
+		}
+		
+		function setData(id, data, obj) {
+			$.each(obj, function(i, v) {
+				data.append("image{0}".format(id), v.rt);
+			});
+		}
+	</script>
+
+</body>
+</html>

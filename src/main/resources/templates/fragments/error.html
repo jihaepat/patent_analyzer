@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+
+<!--/////////////////////////////////////////////////////////////////////////////
+//
+//(c)2003-2018 ITS-I Inc. All Rights Reserved.
+//
+//THIS SOURCE FILE IS THE PROPERTY OF ITS-I Inc. AND IS NOT TO BE
+//RE-DISTRIBUTED BY ANY MEANS WHATSOEVER WITHOUT THE EXPRESSED
+//WRITTEN CONSENT OF ITS-I Inc.
+//
+//CONTACT INFORMATION:
+//support@its-i.co.kr
+//http://www.its-i.co.kr
+//
+/////////////////////////////////////////////////////////////////////////////-->
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+<body>
+	<div th:fragment="error">
+		<script type="text/javascript">
+			alert("asdf");
+			
+			function downFail(message) {
+				var toastIndex = 1;
+
+	            toastr.options = {
+	                closeButton: $('#closeButton').prop('checked'),
+	                debug: $('#debugInfo').prop('checked'),
+	                progressBar: $('#progressBar').prop('checked'),
+	                preventDuplicates: $('#preventDuplicates').prop('checked'),
+	                positionClass: $('#positionGroup input:radio:checked').val() || 'toast-top-right',
+	                onclick: null,
+	                showDuration: 100,
+	                hideDuration: 500,
+	                timeOut: 3000,
+	                extendedTimeOut: 500,
+	                hideEasing: 'linear',
+	                showEasing: 'linear',
+	                showMethod: 'slideDown',
+	                hideMethod: 'slideUp'
+	            };
+	            
+	            $("#toastrOptions").text("Command: toastr[success](\"복사\")\n\ntoastr.options = "+ JSON.stringify(toastr.options, null, 2));
+	            var $toast = toastr["success"]("엑셀 다운로드 실패했습니다.<br/>관리자에게 문의하십시오.", "다운로드 실패"); // Wire up an event handler to a button in the toast, if it exists
+	            $toastlast = $toast;
+	            if ($toast.find('#okBtn').length) {
+	                $toast.delegate('#okBtn', 'click', function () {
+	                    alert('you clicked me. i was toast #' + toastIndex + '. goodbye!');
+	                    $toast.remove();
+	                });
+	            }
+	            if ($toast.find('#surpriseBtn').length) {
+	                $toast.delegate('#surpriseBtn', 'click', function () {
+	                    alert('Surprise! you clicked me. i was toast #' + toastIndex + '. You could perform an action here.');
+	                });
+	            }
+			}
+		</script>
+	</div>
+</body>
+</html>

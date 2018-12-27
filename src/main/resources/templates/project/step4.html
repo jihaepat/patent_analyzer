@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+
+<!--/////////////////////////////////////////////////////////////////////////////
+//
+//(c)2003-2018 ITS-I Inc. All Rights Reserved.
+//
+//THIS SOURCE FILE IS THE PROPERTY OF ITS-I Inc. AND IS NOT TO BE
+//RE-DISTRIBUTED BY ANY MEANS WHATSOEVER WITHOUT THE EXPRESSED
+//WRITTEN CONSENT OF ITS-I Inc.
+//
+//CONTACT INFORMATION:
+//support@its-i.co.kr
+//http://www.its-i.co.kr
+//
+/////////////////////////////////////////////////////////////////////////////-->
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+</head>
+
+<style layout:fragment="pageStyle" type="text/css">
+.filebox label { display: inline-block; padding: .5em .75em; color: #999; font-size: inherit; line-height: normal; vertical-align: middle; background-color: #fdfdfd; cursor: pointer; border: 1px solid #ebebeb; border-bottom-color: #e2e2e2; border-radius: .25em; } .filebox input[type="file"] { /* 파일 필드 숨기기 */ position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip:rect(0,0,0,0); border: 0; }
+
+.modal-body {
+	padding: 0px;
+}
+</style>
+
+<body>
+
+	<div class="row" layout:fragment="mainContent">
+		<div class="ibox float-e-margins">
+			<div class="ibox-content">
+				<div id="wizard" role="application" class="wizard clearfix">
+					<div class="steps clearfix" th:include="fragments/project :: menu"></div>
+					
+					<div class="row">
+						<div class="col-lg-12">
+							<form id="project_step4" name="project_step4" method="post" class="form-horizontal">
+								<div class="float-e-margins">
+									<div class="ibox-title">
+										<h5>특허 추천 설정</h5>
+										<div class="ibox-tools">
+											<button type="button" class="btn btn-primary" id="btnForm4Save">저장</button>
+											<button type="button" class="btn btn-info" id="btnForm4Next" style="display: none;">다음</button>
+										</div>
+									</div>
+								</div>
+								<div class="ibox-content project_form_content">
+									<div class="panel panel-default">
+                                        <div class="panel-heading">
+                                            추천 기준
+                                        </div>
+                                        <div class="panel-body">
+                                            <div class="row">
+												<div class="col-sm-3">
+													<select class="form-control" id="standard" name="standard">
+														<option value="0">상위</option>
+														<option value="1">기준점수</option>
+													</select>
+												</div>
+												<div class="col-sm-9 divnumber">
+													<input type="text" class="form-control input_text_2" id="numb" name="numb"/>건 까지
+												</div>
+												<div class="col-sm-9 divscore" style="display: none;">
+													<input type="text" class="form-control input_text_2" id="score" name="score"/>점 이상
+												</div>
+											</div>
+                                        </div>
+                                    </div>
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">
+                                            특허 평가 계수 설정
+                                        </div>
+                                        <div class="panel-body">
+                                            <div class="row">
+												<div class="form-group">
+													<label class="col-sm-3 control-label">권리화 지수</label>
+													<div class="col-sm-8">
+														<div id="ionrange_1"></div>
+													</div>
+												</div>
+											</div>
+											<div class="row">
+												<div class="form-group">
+													<label class="col-sm-3 control-label">권리존속 지수</label>
+													<div class="col-sm-8">
+														<div id="ionrange_2"></div>
+													</div>
+												</div>
+											</div>
+											<div class="row">
+												<div class="form-group">
+													<label class="col-sm-3 control-label">우선권 지수</label>
+													<div class="col-sm-8">
+														<div id="ionrange_3"></div>
+													</div>
+												</div>
+											</div>
+											<div class="row">
+												<div class="form-group">
+													<label class="col-sm-3 control-label">피인용 지수</label>
+													<div class="col-sm-8">
+														<div id="ionrange_4"></div>
+													</div>
+												</div>
+											</div>
+											<div class="row">
+												<div class="form-group">
+													<label class="col-sm-3 control-label">패밀리 지수</label>
+													<div class="col-sm-8">
+														<div id="ionrange_5"></div>
+													</div>
+												</div>
+											</div>
+											<div class="row">
+												<div class="form-group">
+													<label class="col-sm-3 control-label">청구항 지수</label>
+													<div class="col-sm-8">
+														<div id="ionrange_6"></div>
+													</div>
+												</div>
+											</div>
+                                        </div>
+                                    </div>
+								</div>
+							</form>
+						</div>
+					</div>
+					
+					<div class="ibox float-e-margins">
+						<div class="ibox-title">
+							<h5>핵심 추천 특허 목록</h5>
+						</div>
+						<div class="ibox-content project_form_content">
+							<div id="recommendPatentList"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	
+
+	<script layout:fragment="pageScript" th:inline="javascript">
+		$(document).ready(function() {
+			eventSpinner();
+			$("#integrityModal").on("shown.bs.modal", function () {
+				closedSpinner();
+			});
+			
+			var defaultStatus = /*[[${projectinfo.status}]]*/
+			$("#standard").change(function() {
+				showIput($(this).val());
+			});
+			
+			var standard = /*[[${projectinfo.stnd}]]*/;
+			showIput(standard);
+			
+			$("#standard").val(standard);
+			$("#numb").val(/*[[${projectinfo.numb}]]*/);
+			$("#score").val(/*[[${projectinfo.scre}]]*/);
+			
+			$("#ionrange_1").ionRangeSlider({
+				type: 'single', grid: true,
+			    values: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+			    from: /*[[${projectinfo.idxrght}]]*/
+			});
+			$("#ionrange_2").ionRangeSlider({
+				type: 'single', grid: true,
+			    values: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+			    from: /*[[${projectinfo.idxcntnrght}]]*/
+	        });
+			$("#ionrange_3").ionRangeSlider({
+				type: 'single', grid: true,
+			    values: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+			    from: /*[[${projectinfo.idxprrty}]]*/
+	        });
+			$("#ionrange_4").ionRangeSlider({
+				type: 'single', grid: true,
+			    values: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+			    from: /*[[${projectinfo.idxqtd}]]*/
+	        });
+			$("#ionrange_5").ionRangeSlider({
+				type: 'single', grid: true,
+			    values: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+			    from: /*[[${projectinfo.idxfmly}]]*/
+	        });
+			$("#ionrange_6").ionRangeSlider({
+				type: 'single', grid: true,
+			    values: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+			    from: /*[[${projectinfo.idxclm}]]*/
+	        });
+			
+			if (defaultStatus > 7) {
+				$("#btnForm4Next").show();
+				loadList(1);
+			}
+			
+			$("#btnForm4Save").click(function() {
+				var message = swalMessage(defaultStatus, 7);
+				sweetsubmit({text:message}, function() {
+					var data = new FormData();
+					var standard = $("#standard").val();
+					
+					data.append("id", /*[[${projectId}]]*/);
+					data.append("stnd", standard);
+					if (standard == '1') {
+						var numb = $("#numb").val();
+						if (!numb) {
+							alert(numb);
+							return;
+						}
+						data.append("numb", numb);
+						data.append("scre", (($("#score").val()) ? $("#score").val() : 0));
+					} else {
+						var score = $("#score").val();
+						if (!score) {
+							alert(score);
+							return;
+						}
+						data.append("numb", (($("#numb").val()) ? $("#numb").val() : 0));
+						data.append("scre", score);
+					}
+					data.append("idxrght", $("#ionrange_1").data("ionRangeSlider").result.from);
+					data.append("idxcntnrght", $("#ionrange_2").data("ionRangeSlider").result.from);
+					data.append("idxprrty", $("#ionrange_3").data("ionRangeSlider").result.from);
+					data.append("idxqtd", $("#ionrange_4").data("ionRangeSlider").result.from);
+					data.append("idxfmly", $("#ionrange_5").data("ionRangeSlider").result.from);
+					data.append("idxclm", $("#ionrange_6").data("ionRangeSlider").result.from);
+					
+					loadSpinner();
+					patentFormDataSubmit(/*[[@{'/project/updateStep4'}]]*/, data,
+						function (res) {
+							closedSpinner();
+							myInterval(saveSuccess);
+						},
+						function () {
+							closedSpinner();
+							myInterval(saveFail);
+						}
+					);
+					
+				});
+			});
+			
+			$("#btnForm4Next").click(function() {
+				var data = new FormData();
+				data.append("id", /*[[${projectId}]]*/);
+				patentFormDataSubmit(/*[[@{'/project/step4/finish'}]]*/, data,
+					function (res) {
+						patentMovePage(/*[[@{/project/step5}]]*/, 0, 0, {"id":/*[[${projectId}]]*/});
+					},
+					function () {
+						sweetalert("저장에 실패했습니다.", "error");
+					}
+				);
+			});
+		});
+		
+		function showIput(standard) {
+			$(".divscore").hide();
+			$(".divnumber").hide();
+			
+			if (standard == 0) {
+				$(".divnumber").show();
+			} else {
+				$(".divscore").show();
+			}
+		}
+		
+		function myInterval(func) {
+			var loadValues = setInterval(function() {
+				func();
+				clearInterval(loadValues)
+			}, 500);			
+		}
+		function saveSuccess() {
+			sweetalert("저장에 성공했습니다.", "success", function() {
+				$("#btnForm4Next").show();
+				loadList(1);
+			});
+		}
+		function saveFail() {
+			sweetalert("저장에 실패했습니다.", "error");
+		}
+        
+		function loadList(page) {
+			loadListPage("recommendPatentList", /*[[@{'/project/step4/getRecommendPatentList'}]]*/, {id: /*[[${projectId}]]*/,page:page,limit:$("#searchLimit").val(),search:$("#searchVal").val()}, function() {
+				closedSpinner();
+			});	
+		}
+
+		function downExcelAction() {
+			downExcel(/*[[@{'/project/downloadExcel/'} + ${projectId} + '/4']]*/, $("#searchVal").val());
+		}
+	</script>
+
+</body>
+</html>

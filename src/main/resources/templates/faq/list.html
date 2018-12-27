@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+
+<!--/////////////////////////////////////////////////////////////////////////////
+//
+//(c)2003-2018 ITS-I Inc. All Rights Reserved.
+//
+//THIS SOURCE FILE IS THE PROPERTY OF ITS-I Inc. AND IS NOT TO BE
+//RE-DISTRIBUTED BY ANY MEANS WHATSOEVER WITHOUT THE EXPRESSED
+//WRITTEN CONSENT OF ITS-I Inc.
+//
+//CONTACT INFORMATION:
+//support@its-i.co.kr
+//http://www.its-i.co.kr
+//
+/////////////////////////////////////////////////////////////////////////////-->
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+	<style layout:fragment="pageStyle" type="text/css">
+		.faq-item {
+			padding: 20px 50px !important;
+		}
+	</style>
+</head>
+
+<body>
+	
+	<div class="row" layout:fragment="mainContent">
+		<div class="row wrapper border-bottom white-bg page-heading">
+			<div class="col-sm-4">
+				<h2>특허 분석 플랫폼 FAQ</h2>
+			</div>
+			<div class="col-sm-8">
+				<div class="title-action" th:if="${session.patent_login_session} ? ${session.patent_login_session.member.grade} == 10">
+					<a href="javascript:showQuestion();" class="btn btn-primary btn-sm">질문하기</a>
+				</div>
+			</div>
+		</div>
+		
+		<div class="row">
+			<div class="col-lg-12">
+				<div id="faqList"></div>
+			</div>
+		</div>
+		
+		<div class="modal inmodal fade" id="faqQuestionModal" tabindex="-1" role="dialog" aria-hidden="true">
+	        <div class="modal-dialog modal-lg">
+	            <div class="modal-content">
+	                <div class="modal-header">
+	                    <button type="button" class="close" data-dismiss="modal">
+	                        <span aria-hidden="true">&times;</span>
+	                        <span class="sr-only">Close</span>
+	                    </button>
+	                    <h4 class="modal-title" id="title">질문 등록</h4>
+	                </div>
+	                
+	                <form id="faqQuestionForm" role="form" th:action="@{/faq/question}" method="POST">
+		                <div class="modal-body">
+	                		<div class="ibox float-e-margins">
+								<div class="ibox-content">
+									<div class="form-group">
+										<label>질문 *</label> <label id="question-error" class="error" for="question"></label>
+										<input id="question" name="question" type="text" placeholder="질문을 입력하십시요." class="form-control" />
+									</div>
+								</div>
+			                </div>
+		                </div>
+	                    <div class="modal-footer">
+	                        <button type="button" class="btn btn-white" data-dismiss="modal">취소</button>
+	                        <button type="submit" class="btn btn-primary">저장</button>
+	                    </div>
+                    </form>
+	            </div>
+	        </div>
+	    </div>
+	    <div class="modal inmodal fade" id="faqAnswerModal" tabindex="-1" role="dialog" aria-hidden="true">
+	        <div class="modal-dialog modal-lg">
+	            <div class="modal-content">
+	                <div class="modal-header">
+	                    <button type="button" class="close" data-dismiss="modal">
+	                        <span aria-hidden="true">&times;</span>
+	                        <span class="sr-only">Close</span>
+	                    </button>
+	                    <h4 class="modal-title" id="title">답변 등록</h4>
+	                </div>
+	                
+	                <form id="faqAnswerForm" role="form" th:action="@{/faq/answer}" method="POST">
+	                	<input id="id" name="id" type="hidden" />
+		                <div class="modal-body">
+	                		<div class="ibox float-e-margins">
+								<div class="ibox-content">
+									<div class="form-group">
+										<label>답변 *</label> <label id="answer-error" class="error" for="answer"></label>
+										<input id="answer" name="answer" type="text" placeholder="답변을 입력하십시요." class="form-control" />
+									</div>
+								</div>
+			                </div>
+		                </div>
+	                    <div class="modal-footer">
+	                        <button type="button" class="btn btn-white" data-dismiss="modal">취소</button>
+	                        <button type="submit" class="btn btn-primary">저장</button>
+	                    </div>
+                    </form>
+	            </div>
+	        </div>
+	    </div>
+	    
+	    
+	</div>
+	
+	<script layout:fragment="pageScript" th:inline="javascript">
+		$(document).ready(function() {
+			loadList(0);
+			
+			$("#faqQuestionForm").validate({
+				onkeyup: false,
+				rules : {
+					question: {
+						required: true,
+						minlength: 10
+					}
+				}, messages: {
+					question: {
+						required: "질문을 입력하세요.",
+						minlength: $.validator.format("질문은 최소 {0} 글자 이상 입력하세요.")
+					}
+				}, submitHandler: function(form) {
+					patentFormSubmit(/*[[@{'/faq/question'}]]*/, {question: form.question.value}, 
+						function () {
+							showQuestion();
+							loadList(0);
+						},
+						function () {
+							$("#form").validate().showErrors({"question": "질문등록에 실패했습니다."});
+						}
+					);
+				}
+			});
+			
+			$("#faqAnswerForm").validate({
+				onkeyup: false,
+				rules : {
+					answer: {
+						required: true,
+						minlength: 10
+					}
+				}, messages: {
+					answer: {
+						required: "답변을 입력하세요.",
+						minlength: $.validator.format("답변은 최소 {0} 글자 이상 입력하세요.")
+					}
+				}, submitHandler: function(form) {
+					var seq = form.id.value;
+					patentFormSubmit(/*[[@{'/faq/answer'}]]*/, {id: seq, answer: form.answer.value}, 
+						function () {
+							showAnswer();
+		        			loadList($(".pagination").find('.active').find('span').html(), function () {
+		        				$("#itemFaq"+seq)[0].click()
+		        			});
+						},
+						function () {
+							$("#form").validate().showErrors({"answer": "답변등록에 실패했습니다."});
+						}
+					);
+				}
+			});
+		});
+		
+		function loadList(page, func) {
+			var url = /*[[@{'/faq/list'}]]*/;
+			data = {'page':page};
+
+			$("#faqList").load(/*[[@{'/faq/list'}]]*/, data, func);
+		}
+		
+		function showQuestion() {
+            allClearForm("faqQuestionForm");
+            $("#faqQuestionModal").modal("toggle");
+            
+            $("#question").focus();
+        }
+		
+		function showAnswer(seq) {
+			allClearForm("faqAnswerForm");
+			$("#faqAnswerForm").find('#id').val(seq);
+            $("#faqAnswerModal").modal("toggle");
+		}
+
+	</script>
+	
+</body>
+</html>

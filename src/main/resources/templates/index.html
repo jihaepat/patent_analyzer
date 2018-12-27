@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+
+<!--/////////////////////////////////////////////////////////////////////////////
+//
+//(c)2003-2018 ITS-I Inc. All Rights Reserved.
+//
+//THIS SOURCE FILE IS THE PROPERTY OF ITS-I Inc. AND IS NOT TO BE
+//RE-DISTRIBUTED BY ANY MEANS WHATSOEVER WITHOUT THE EXPRESSED
+//WRITTEN CONSENT OF ITS-I Inc.
+//
+//CONTACT INFORMATION:
+//support@its-i.co.kr
+//http://www.its-i.co.kr
+//
+/////////////////////////////////////////////////////////////////////////////-->
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="layout/base.html">
+<head>
+</head>
+
+<body style="padding-right: 0px !important;">
+	
+	<div class="row" layout:fragment="topmenu" id="topmenu" style="margin-left:0px;margin-right:0px;">
+		<div th:replace="fragments/menu :: topmenu"></div>
+	</div>
+	<div layout:fragment="mainContent" id="mainContent">
+	</div>
+	
+	<script layout:fragment="pageScript" th:inline="javascript">
+		if ("onpopstate" in window) {
+			history.pushState(null, null, location.href);
+			window.onpopstate = function(event) {
+				history.go(1);
+			};
+		}
+		
+		$(document).keydown(function(e) {
+			key = (e) ? e.keyCode : event.keyCode;
+			var t = document.activeElement;
+
+			if (key == 8 || key == 116 || key == 17 || key == 82) {
+// 			if (key == 8 || key == 116 || key == 17) {
+				if (key == 8) {
+					if (t.tagName != "INPUT" && t.tagName != 'TEXTAREA') {
+						if (e) {
+							e.preventDefault();
+						} else {
+							event.keyCode = 0;
+							event.returnValue = false;
+						}
+					}
+				} else {
+					if (e) {
+						e.preventDefault();
+					} else {
+						event.keyCode = 0;
+						event.returnValue = false;
+					}
+				}
+			}
+		});
+	
+		$(document).ready(function() {
+			patentMovePage(/*[[@{/sub}]]*/);
+			eventSpinner();
+		});
+		
+		function ajaxError(xhr) {
+			if (xhr.status == '998') {
+				clearView(/*[[@{/sub}]]*/);
+			} else if (xhr.status == '999') {
+				clearView(/*[[@{/login}]]*/);
+			} else if (xhr.status != '0') {
+				clearView(/*[[@{/error}]]*/);
+			} else {
+				sweetalert("서버 오류입니다. 관리자에게 문의하십시오.", "error", function() {
+					closedSpinner();	
+				});
+			}
+		}
+		
+		function patentMovePage(url, r, a, data, top) {
+			if (top) {
+				reloadTopmenu(a);
+			}
+			if (data) {
+				$("#mainContent").load(url, data, function (rt, status, xhr) {
+					patentMovePageResponse(url, r, a, rt, status, xhr);
+				});
+			} else {
+				$("#mainContent").load(url, function (rt, status, xhr) {
+					patentMovePageResponse(url, r, a, rt, status, xhr);
+				});
+			}
+		}
+		
+		function patentMovePageResponse(url, r, a, rt, ts, xhr) {
+			if (xhr.status == '200') {
+				if (r) {
+					reloadTopmenu(a);
+				} else {
+					if (a) {
+						$(".navbar-nav").find("li").removeClass("active");
+						$("#"+a).addClass("active");
+					}
+				}
+			} else {
+				ajaxError(xhr);
+			}
+		}
+
+		function reloadTopmenu(a) {
+			$("#topmenu").load(/*[[@{/topmenu}]]*/, function() {
+				if (a) {
+					$(".navbar-nav").find("li").removeClass("active");
+					$("#"+a).addClass("active");
+				}
+			});
+		}
+
+		function loadListPage(id, url, data, func) {
+			data = data || {page: "1"};
+
+			$("#"+id).load(url, data, function(rt, ts, xhr) {
+				if (xhr.status == '200') {
+					func();
+				}
+			});
+		}
+		
+		function loadSubPage(id, url, data, func) {
+			$("#"+id).load(url, data, function (rt, ts, xhr) {
+				if (xhr.status == '200') {
+					func(rt, ts, xhr);
+				} else {
+					ajaxError(xhr);
+				}
+			});
+		}
+		
+		function patentFormSubmit(url, data, funcSuccess, funcFailure) {
+			$.ajax({
+		        url : url,
+		        method : 'POST',
+		        dataType: 'json',
+		        data: data,
+		        sync: false,
+		        success: function (res) {
+		        	if (res) {
+		        		if (res.result) {
+		        			funcSuccess(res);
+		        		} else {
+		        			funcFailure(res);
+		        		}
+		        	}
+		        },
+		        error: function (xhr, rt, sts) {
+					ajaxError(xhr);
+				}
+			});
+		}
+		
+		function patentFormDataSubmit(url, data, funcSuccess, funcFailure, funcComp) {
+			$.ajax({
+		        url : url,
+		        method : 'POST',
+		        dataType: 'json',
+		        processData: false,
+		        contentType: false,
+		        cache: false,
+		        data: data,
+		        sync: false,
+		        success: function (res) {
+		        	if (res) {
+		        		if (res.result) {
+		        			funcSuccess(res);
+		        		} else {
+		        			funcFailure(res);
+		        		}
+		        	}
+		        },
+		        error: function (xhr, rt, sts) {
+					ajaxError(xhr);
+				},
+				complete:function(){
+					if (funcComp) funcComp();
+				}
+			});
+		}
+		
+		function patentFormFileSubmit(url, data, funcSuccess, funcFailure) {
+			$.ajax({
+		        url : url,
+		        method : 'POST',
+		        processData: false,
+		        contentType: false,
+		        cache: false,
+		        dataType: 'html',
+		        data: data,
+		        sync: false,
+		        success: function (res) {
+		        	if (res) {
+		        		var obj = JSON.parse(res);
+		        		if (obj.result) {
+		        			funcSuccess(res);
+		        		} else {
+		        			funcFailure(res);
+		        		}
+		        	}
+		        },
+		        error: function (xhr, rt, sts) {
+					ajaxError(xhr);
+				}
+			});
+		}
+		
+		function clearView(url) {
+			var modal = $(".modal").data("bs.modal");
+			if (modal) {
+				if (modal.isShown) {
+					$(".modal").modal("hide");
+				}
+			}
+			$("#spinnerModal").modal("hide");
+        	$(".modal-backdrop").hide();
+			swal.close();
+			
+			if (url) {
+				patentMovePage(url, 1);	
+			}
+		}
+		
+		function loadSpinner(txt) {
+			if (txt) {
+				$("#spinnerContent").html(txt);
+			}
+
+			$("#spinnerModal").modal("show");
+			swal.close();
+		}
+		function closedSpinner() {
+			$("#spinnerContent").html("");
+			$("#spinnerModal").modal("hide");
+		}
+		
+		function activePageNumber(id) {
+			var num = $("#"+id).find(".pagination").find(".active").find("span").html();
+			if (num) {
+				return num*1;
+			}
+			return 0;
+		}
+		
+		function viewAccountPop(id) {
+			loadSubPage("myAccountInfo", /*[[@{'/manager/info'}]]*/, {id:id}, function() {
+				if (id == -1) {
+					$("#grade").attr('disabled', true);
+				} else {
+					$("#grade").attr('disabled', false);
+				}
+				$("#memberForm").validate({
+					onkeyup: false,
+					rules : {
+						usrid: {
+							required: true,
+							minlength: 5,
+							maxlength: 15
+						},
+						usrpass: {
+							minlength: 5,
+							maxlength: 15
+						},
+						confirm: {
+							equalTo: "#usrpass"
+						},
+						usrname: {
+							required: true,
+							minlength: 2,
+							maxlength: 15
+						},
+						position: {
+							required: false,
+							minlength: 2,
+							maxlength: 15
+						},
+						mailaddr: {
+							required: true,
+							email: true
+						},
+						phone: {
+							phone: true
+						}
+					}, messages: {
+						usrid: {
+							required: "아이디를 입력하세요.",
+							remote : "해당 아이디는 중복되었습니다.",
+							minlength: $.validator.format("아이디는 최소 {0} 글자 이상 입력하세요."),
+							maxlength: $.validator.format("아이디는 최대 {0} 글자까지 입력하세요.")
+						},
+						usrpass: {
+							minlength: $.validator.format("비밀번호는 최소 {0} 글자 이상 입력하세요."),
+							maxlength: $.validator.format("비밀번호는 최대 {0} 글자까지 입력하세요.")
+						},
+						confirm: {
+							equalTo: "비밀번호가 일치하지 않습니다."
+						},
+						usrname: {
+							required: "이름을 입력하세요.",
+							minlength: $.validator.format("이름은 최소 {0} 글자 이상 입력하세요."),
+							maxlength: $.validator.format("이름은 최대 {0} 글자까지 입력하세요.")
+						},
+						position: {
+							minlength: $.validator.format("소속은 최소 {0} 글자 이상 입력하세요."),
+							maxlength: $.validator.format("소속은 최대 {0} 글자까지 입력하세요.")
+						},
+						mailaddr: {
+							required: "이메일을 입력하세요.",
+							email: $.validator.format("이메일을 정확하게 입력하십시오.")
+						}
+					}, submitHandler: function(form) {
+						patentFormSubmit(/*[[@{'/manager/update'}]]*/, $(form).serializeArray(), 
+							function (res) {
+								$("#accountModal").modal("hide");
+								if (id != -1) {
+									loadList(activePageNumber("memberList"));
+								}
+							},
+							function () {
+								$("#memberForm").validate().showErrors({"usrid": "사용자 등록에 실패했습니다."});
+							}
+						);
+					}
+				});
+				
+				$("#accountModal").modal("show");
+			});
+		}
+		
+		var toastCount = 0;
+		function downExcel(url, search) {
+			loadSpinner();
+			$.fileDownload(url, {
+				httpMethod:"POST",
+				data: {'search' : search},
+				successCallback: function (url) {
+					closedSpinner();
+				},
+			    failCallback: function (html, url) {
+			    	closedSpinner();
+			    }
+			}).done(function() {
+			}).fail(function(responseHtml, url) {
+		    	downFail(responseHtml);
+			});
+		}
+		
+		function downFail(message) {
+			var toastIndex = toastCount++;
+
+            toastr.options = {
+                closeButton: $('#closeButton').prop('checked'),
+                debug: $('#debugInfo').prop('checked'),
+                progressBar: $('#progressBar').prop('checked'),
+                preventDuplicates: $('#preventDuplicates').prop('checked'),
+                positionClass: $('#positionGroup input:radio:checked').val() || 'toast-top-right',
+                onclick: null,
+                showDuration: 100,
+                hideDuration: 500,
+                timeOut: 3000,
+                extendedTimeOut: 500,
+                hideEasing: 'linear',
+                showEasing: 'linear',
+                showMethod: 'slideDown',
+                hideMethod: 'slideUp'
+            };
+            
+            $("#toastrOptions").text("Command: toastr[success](\"복사\")\n\ntoastr.options = "+ JSON.stringify(toastr.options, null, 2));
+            var $toast = toastr["success"](message + "<br/>관리자에게 문의하십시오.", "다운로드 실패"); // Wire up an event handler to a button in the toast, if it exists
+            $toastlast = $toast;
+            if ($toast.find('#okBtn').length) {
+                $toast.delegate('#okBtn', 'click', function () {
+                    alert('you clicked me. i was toast #' + toastIndex + '. goodbye!');
+                    $toast.remove();
+                });
+            }
+            if ($toast.find('#surpriseBtn').length) {
+                $toast.delegate('#surpriseBtn', 'click', function () {
+                    alert('Surprise! you clicked me. i was toast #' + toastIndex + '. You could perform an action here.');
+                });
+            }
+		}
+	</script>
+	
+	
+</body>
+</html>

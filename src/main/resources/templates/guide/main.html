@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+
+<!--/////////////////////////////////////////////////////////////////////////////
+//
+//(c)2003-2018 ITS-I Inc. All Rights Reserved.
+//
+//THIS SOURCE FILE IS THE PROPERTY OF ITS-I Inc. AND IS NOT TO BE
+//RE-DISTRIBUTED BY ANY MEANS WHATSOEVER WITHOUT THE EXPRESSED
+//WRITTEN CONSENT OF ITS-I Inc.
+//
+//CONTACT INFORMATION:
+//support@its-i.co.kr
+//http://www.its-i.co.kr
+//
+/////////////////////////////////////////////////////////////////////////////-->
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+</head>
+
+<body>
+
+	<div class="row" layout:fragment="mainContent">
+		<div class="ibox float-e-margins">
+			<div class="ibox-content">
+				<div id="wizard" role="application" class="wizard clearfix">
+					<div class="steps clearfix">
+						<ul role="tablist">
+							<li role="tab" aria-disabled="false" class="first current" aria-selected="true">
+								<a id="wizard-t-0" href="javascript:onSet('0');" aria-controls="wizard-p-0">
+									<span class="number">01.</span> 프로젝트 생성
+								</a>
+							</li>
+							<li role="tab" aria-disabled="false" class="done" aria-selected="false">
+								<a id="wizard-t-1" href="javascript:onSet('1');" aria-controls="wizard-p-1">
+									<span class="number">02.</span> 노이즈 필터링
+								</a>
+							</li>
+							<li role="tab" aria-disabled="false" class="done" aria-selected="false">
+								<a id="wizard-t-2" href="javascript:onSet('2');" aria-controls="wizard-p-2">
+									<span class="number">03.</span> 무결성 검증
+								</a>
+							</li>
+							<li role="tab" aria-disabled="false" class="done" aria-selected="false">
+								<a id="wizard-t-3" href="javascript:onSet('3');" aria-controls="wizard-p-3">
+									<span class="number">04.</span> 특허 추천
+								</a>
+							</li>
+							<li role="tab" aria-disabled="false" class="done" aria-selected="false">
+								<a id="wizard-t-4" href="javascript:onSet('4');" aria-controls="wizard-p-4">
+									05.</span> 분석 결과 리포팅
+								</a>
+							</li>
+						</ul>
+					</div>
+					<div class="content clearfix">
+						<div class="step-content body" id="wizard-p-0" role="tabpanel" aria-labelledby="wizard-h-0" aria-hidden="false" style="display: block;">
+							<div class="text-center m-t-md">
+								<h2>Hello in Step 1</h2>
+								<p>This is the first content.</p>
+							</div>
+						</div>
+
+						<div class="step-content body" id="wizard-p-1" role="tabpanel" aria-labelledby="wizard-h-1" aria-hidden="true" style="display: none;">
+							<div class="text-center m-t-md">
+								<h2>This is step 2</h2>
+								<p>This content is diferent than the first one.</p>
+							</div>
+						</div>
+
+						<div class="step-content body" id="wizard-p-2" role="tabpanel" aria-labelledby="wizard-h-2" aria-hidden="true" style="display: none;">
+							<div class="text-center m-t-md">
+								<h2>This is step 3</h2>
+								<p>This is last content.</p>
+							</div>
+						</div>
+
+						<div class="step-content body" id="wizard-p-3" role="tabpanel" aria-labelledby="wizard-h-3" aria-hidden="true" style="display: none;">
+							<div class="text-center m-t-md">
+								<h2>This is step 4</h2>
+								<p>This is last content.</p>
+							</div>
+						</div>
+
+						<div class="step-content body" id="wizard-p-4" role="tabpanel" aria-labelledby="wizard-h-4" aria-hidden="true" style="display: none;">
+							<div class="text-center m-t-md">
+								<h2>This is step 5</h2>
+								<p>This is last content.</p>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+
+	<script layout:fragment="pageScript" th:inline="javascript">
+		$(document).ready(function() {
+		});
+		
+		function onSet(id) {
+			$("#wizard").find(".current").removeClass("current").addClass("done");
+			$("#wizard-t-"+id).parent().removeClass("done").addClass("current");
+			
+			$(".step-content").hide();
+			$("#wizard-p-"+id).show();
+		}
+		
+	</script>
+</body>
+</html>

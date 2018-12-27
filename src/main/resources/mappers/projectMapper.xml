@@ -1,0 +1,1389 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<!--/////////////////////////////////////////////////////////////////////////////
+//
+//(c)2003-2017 ITS-I Inc. All Rights Reserved.
+//
+//THIS SOURCE FILE IS THE PROPERTY OF ITS-I Inc. AND IS NOT TO BE
+//RE-DISTRIBUTED BY ANY MEANS WHATSOEVER WITHOUT THE EXPRESSED
+//WRITTEN CONSENT OF ITS-I Inc.
+//
+//CONTACT INFORMATION:
+//support@its-i.co.kr
+//http://www.its-i.co.kr
+//
+/////////////////////////////////////////////////////////////////////////////-->
+
+<mapper namespace="com.patent.dao.mapper.ProjectMapper">
+	
+	
+	<insert id="insertUnification">
+		insert into tb_aplct_unfcn
+					(id, name, unfcn)
+		values		(#{id}, #{name}, #{unfcn})
+	</insert>
+	
+	
+	
+	<resultMap type="com.patent.web.domain.Pair" id="resultIntegerString">
+		<result property="v1" column="v1" javaType="java.lang.Integer"/>
+		<result property="v2" column="v2" javaType="java.lang.String"/>	
+	</resultMap>
+	<resultMap type="com.patent.web.domain.Pair" id="resultStringString">
+		<result property="v1" column="v1" javaType="java.lang.String"/>
+		<result property="v2" column="v2" javaType="java.lang.String"/>	
+	</resultMap>
+	<resultMap type="com.patent.web.domain.Pair" id="resultInteger2">
+		<result property="v1" column="v1" javaType="java.lang.Integer"/>
+		<result property="v2" column="v2" javaType="java.lang.Integer"/>	
+	</resultMap>
+	
+	
+	
+	<select id="getProjectTest" resultType="Integer">
+		SELECT	stp_tst
+		FROM	TB_TESTS
+	</select>
+	<update id="updateProjectTest">
+		UPDATE	TB_TESTS
+		SET		stp_tst = '${index}'
+	</update>
+	
+	<select id="getProjectListSize" resultType="Integer">
+		SELECT	COUNT(id)
+		FROM	TB_PROJECTS
+		WHERE	member_id = #{id}
+	</select>
+	
+	<select id="getProjectList" resultType="com.patent.web.project.domain.ProjectStep1">
+		select id, name, bulletin, reg_bulletin AS regBulletin, public_bulletin AS publicBulletin, classification, status, reg_date AS regDate, ROW_NUMBER () OVER (ORDER BY id ASC) AS rownum 
+		from TB_PROJECTS WHERE member_id = #{memberId} ORDER BY id desc LIMIT #{onepagelstcnt} OFFSET #{offset}
+	</select>
+	
+	<select id="getProjectStatus" resultType="Integer">
+		SELECT	status
+		FROM	TB_PROJECTS
+		WHERE	id = #{projectId}
+	</select>
+	
+	<update id="updateProjectStatus">
+		UPDATE	TB_PROJECTS
+		SET		status = '${status}'
+		WHERE	id = #{projectId}
+	</update>
+	
+	<select id="getClmnProject" resultType="com.patent.web.project.domain.CLMN">
+		select name, mthd
+		from tb_project_clmns pc inner join tb_clmn_code cc on pc.clmn_id = cc.id and pc.project_id = #{id}
+		order by pc.clmn_ordr asc
+	</select>
+	
+	
+	
+	
+	<insert id="createPatentTable">
+		CREATE SEQUENCE public.SEQ_${tableName}
+		    INCREMENT 1
+		    START 1
+		    MINVALUE 1
+		    MAXVALUE 9223372036854775807
+		    CACHE 1;
+		ALTER SEQUENCE public.SEQ_${tableName} OWNER TO patent;
+    
+		CREATE TABLE public.TB_${tableName}
+		(
+			project_id integer NOT NULL,
+		    file_id integer NOT NULL,
+		    clss_id integer NOT NULL,
+		    clss1 text COLLATE pg_catalog."default",
+		    clss2 text COLLATE pg_catalog."default",
+		    clss3 text COLLATE pg_catalog."default",
+		    id integer NOT NULL,
+		    nat text COLLATE pg_catalog."default",
+		    dbt text COLLATE pg_catalog."default",
+		    ptt text COLLATE pg_catalog."default",
+		    dct text COLLATE pg_catalog."default",
+		    nmitn text COLLATE pg_catalog."default",
+		    nmitn2 text COLLATE pg_catalog."default",
+		    rmks text COLLATE pg_catalog."default",
+		    rmks2 text COLLATE pg_catalog."default",
+		    rtvcls text COLLATE pg_catalog."default",
+		    rtvcls2 text COLLATE pg_catalog."default",
+		    clnm integer,
+		    memo text COLLATE pg_catalog."default",
+		    appnm text COLLATE pg_catalog."default",
+		    appnmurl text COLLATE pg_catalog."default",
+		    dtrl text COLLATE pg_catalog."default",
+		    trnsdtsb text COLLATE pg_catalog."default",
+		    pubnm text COLLATE pg_catalog."default",
+		    pubdt text COLLATE pg_catalog."default",
+		    anmtnm text COLLATE pg_catalog."default",
+		    anmtdt text COLLATE pg_catalog."default",
+		    rgstnm text COLLATE pg_catalog."default",
+		    rgstdt text COLLATE pg_catalog."default",
+		    pblsdt text COLLATE pg_catalog."default",
+		    aplct text COLLATE pg_catalog."default",
+		    aplct2 text COLLATE pg_catalog."default",
+		    aplctnat text COLLATE pg_catalog."default",
+		    aplctnm integer,
+		    crpa text COLLATE pg_catalog."default",
+		    crpaen text COLLATE pg_catalog."default",
+		    crpako text COLLATE pg_catalog."default",
+		    orgaplct text COLLATE pg_catalog."default",
+		    aplctidnt text COLLATE pg_catalog."default",
+		    inv text COLLATE pg_catalog."default",
+		    inv2 text COLLATE pg_catalog."default",
+		    invnat text COLLATE pg_catalog."default",
+		    invnm integer,
+		    agnt text COLLATE pg_catalog."default",
+		    prtnm text COLLATE pg_catalog."default",
+		    prtnat text COLLATE pg_catalog."default",
+		    prtdt text COLLATE pg_catalog."default",
+		    hgstprappnm text COLLATE pg_catalog."default",
+		    hgstprnat text COLLATE pg_catalog."default",
+		    hgstprdtrl text COLLATE pg_catalog."default",
+		    intappnm text COLLATE pg_catalog."default",
+		    intdtrl text COLLATE pg_catalog."default",
+		    intpubnm text COLLATE pg_catalog."default",
+		    intpubdt text COLLATE pg_catalog."default",
+		    dsngnatcd text COLLATE pg_catalog."default",
+		    epcdsngnatcd text COLLATE pg_catalog."default",
+		    orgcpcmn text COLLATE pg_catalog."default",
+		    orgcpcall text COLLATE pg_catalog."default",
+		    orgipcmn text COLLATE pg_catalog."default",
+		    oriipcall text COLLATE pg_catalog."default",
+		    orguscsmn text COLLATE pg_catalog."default",
+		    orguscsall text COLLATE pg_catalog."default",
+		    orgfi text COLLATE pg_catalog."default",
+		    ftrm text COLLATE pg_catalog."default",
+		    orgthmcd text COLLATE pg_catalog."default",
+		    crrtcpcmn text COLLATE pg_catalog."default",
+		    crrtcpcall text COLLATE pg_catalog."default",
+		    crrtipcmn text COLLATE pg_catalog."default",
+		    crrtipcall text COLLATE pg_catalog."default",
+		    crrtuscsmn text COLLATE pg_catalog."default",
+		    crrtuscsall text COLLATE pg_catalog."default",
+		    crrtfi text COLLATE pg_catalog."default",
+		    crrtftrm text COLLATE pg_catalog."default",
+		    qtnnmb1 integer,
+		    qtnnmexm text COLLATE pg_catalog."default",
+		    qtnexmb1 text COLLATE pg_catalog."default",
+		    nspcrfs text COLLATE pg_catalog."default",
+		    qtnnmf1 integer,
+		    qtnnmfe text COLLATE pg_catalog."default",
+		    qtnexmf1 text COLLATE pg_catalog."default",
+		    epoappnm text COLLATE pg_catalog."default",
+		    epofmlydocnm text COLLATE pg_catalog."default",
+		    fmlybpappnm text COLLATE pg_catalog."default",
+		    fmlyappnm text COLLATE pg_catalog."default",
+		    fmlynm text COLLATE pg_catalog."default",
+		    fmlynatdocnm text COLLATE pg_catalog."default",
+		    fmlynatnm text COLLATE pg_catalog."default",
+		    sts text COLLATE pg_catalog."default",
+		    ussts text COLLATE pg_catalog."default",
+		    dsed text COLLATE pg_catalog."default",
+		    crtath text COLLATE pg_catalog."default",
+		    crtath2 text COLLATE pg_catalog."default",
+		    carfc text COLLATE pg_catalog."default",
+		    ncrrnen text COLLATE pg_catalog."default",
+		    ncrrnkr text COLLATE pg_catalog."default",
+		    docdb text COLLATE pg_catalog."default",
+		    orglk text COLLATE pg_catalog."default",
+		    lkorgtxt text COLLATE pg_catalog."default",
+		    vwlk text COLLATE pg_catalog."default",
+		    vwlklgn text COLLATE pg_catalog."default",
+		    repdrw text COLLATE pg_catalog."default",
+		    drwnm text COLLATE pg_catalog."default",
+		    usrclsftag text COLLATE pg_catalog."default",
+		    isappnm text COLLATE pg_catalog."default",
+		    isblltn text COLLATE pg_catalog."default",
+		    wnsky text COLLATE pg_catalog."default",
+<!-- 		    stp_dpn bit(2) DEFAULT B'0'::"bit",	1: 중복 제외, 2: 자동 제거 -->
+			stp_dpn integer default 0,
+		    stp_ns1 bit(1) DEFAULT B'0'::"bit", <!-- 1: KOR 노이즈 제외 -->
+		    stp_ns2 bit(1) DEFAULT B'0'::"bit", <!-- 1: ENG 노이즈 제외 -->
+		    stp_fml bit(1) DEFAULT B'0'::"bit",
+		    stp_qtd bit(1) DEFAULT B'0'::"bit",
+		    ori_aplct text COLLATE pg_catalog."default",
+		    mody_cnt_aplct integer,
+		    idxrght numeric(7,2) DEFAULT 0,
+		    idxcntnrght numeric(5,2) DEFAULT 0,
+		    idxprrty numeric(5,2) DEFAULT 0,
+		    idxqtd numeric(5,2) DEFAULT 0,
+		    idxfmly numeric(5,2) DEFAULT 0,
+		    idxclm numeric(5,2) DEFAULT 0,
+		    scr numeric(10,2) DEFAULT 0,
+		    stp_rcmnd bit(1) DEFAULT B'0'::"bit",
+		    CONSTRAINT tb_${tableName}_key PRIMARY KEY (id),
+		    CONSTRAINT fk_${tableName}_project_id FOREIGN KEY (project_id)
+		        REFERENCES public.tb_projects (id) MATCH SIMPLE
+		        ON UPDATE NO ACTION
+		        ON DELETE CASCADE
+		)
+		WITH (
+			OIDS = FALSE
+		)
+		TABLESPACE pg_default;
+		ALTER TABLE public.TB_${tableName} OWNER to patent;
+		GRANT ALL ON TABLE public.TB_${tableName} TO patent;
+	</insert>
+	
+	<insert id="insertProjectStep1">
+		<selectKey keyProperty ="id" resultType="Integer" order="BEFORE">
+			SELECT	nextval('SEQ_PROJECTS');
+		</selectKey>
+		
+		INSERT INTO	TB_PROJECTS
+					(id, name, bulletin, reg_bulletin, public_bulletin, classification, member_id, reg_date, status, table_name)
+		VALUES		(#{id}, #{name}, #{bulletin}, #{regBulletin}, #{publicBulletin}, #{classification}, #{memberId}, #{regDate}, 1, #{tableName})
+	</insert>
+	<insert id="insertProjectChart">
+		insert into tb_project_charts (id) values (#{id});
+	</insert>
+	
+	<select id="getExcelPatentList" resultType="com.patent.web.project.domain.Patent">
+		select clss1 as strclss1, clss2 as strclss2, clss3 as strclss3, id, NAT, DBT, PTT, DCT, NMITN, NMITN2, RMKS, RMKS2, RTVCLS, RTVCLS2, CLNM, MEMO, APPNM, APPNMURL, DTRL, TRNSDTSB, PUBNM, PUBDT, ANMTNM, ANMTDT, RGSTNM, RGSTDT, PBLSDT, APLCT, APLCT2, APLCTNAT, APLCTNM, CRPA, CRPAEN, CRPAKO, ORGAPLCT, APLCTIDNT, INV, INV2, INVNAT, INVNM, AGNT, PRTNM, PRTNAT, PRTDT, HGSTPRAPPNM, HGSTPRNAT, HGSTPRDTRL, INTAPPNM, INTDTRL, INTPUBNM, INTPUBDT, DSNGNATCD, EPCDSNGNATCD, ORGCPCMN, ORGCPCALL, ORGIPCMN, ORIIPCALL, ORGUSCSMN, ORGUSCSALL, ORGFI, FTRM, ORGTHMCD, CRRTCPCMN, CRRTCPCALL, CRRTIPCMN, CRRTIPCALL, CRRTUSCSMN, CRRTUSCSALL, CRRTFI, CRRTFTRM, QTNNMB1, QTNNMEXM, QTNEXMB1, NSPCRFS, QTNNMF1, QTNNMFE, QTNEXMF1, EPOAPPNM, EPOFMLYDOCNM, FMLYBPAPPNM, FMLYAPPNM, FMLYNM, FMLYNATDOCNM, FMLYNATNM, STS, USSTS, DSED, CRTATH, CRTATH2, CARFC, NCRRNEN, NCRRNKR, DOCDB, ORGLK, LKORGTXT, VWLK, VWLKLGN, REPDRW, DRWNM, USRCLSFTAG, ISAPPNM, ISBLLTN, WNSKY
+		from tb_${tableName} 
+		<choose>
+			<when test="status == 1">where stp_dpn='0' and stp_fml='0' and stp_qtd='0'</when>
+			<when test="status == 2">where stp_dpn='0' and stp_ns1='0' and stp_fml='0' and stp_qtd='0'</when>
+			<when test="status == 3">where stp_dpn='0' and stp_ns1='0'</when>
+			<when test="status == 4">where stp_dpn='0' and stp_ns1='0' and stp_rcmnd='1'</when>
+			<otherwise>where stp_dpn='0' and stp_ns1='0' and stp_rcmnd='1'</otherwise>
+		</choose>
+		<if test="search != null"> and (clss1 like '%${search}%' or clss2 like '%${search}%' or clss3 like '%${search}%' or nat like '%${search}%' or ptt like '%${search}%' or appnm like '%${search}%' or nmitn like '%${search}%' or aplct like '%${search}%') </if>
+		order by id asc
+	</select>
+	
+<!-- 	/******************************************************************************************************************/ -->
+<!-- 	// STEP1 -->
+<!-- 	/******************************************************************************************************************/ -->
+	
+	<select id="getProjectInfo" resultType="com.patent.web.project.domain.ProjectStep1">
+		SELECT	id,
+				name,
+				bulletin,
+				reg_bulletin AS regBulletin,
+				public_bulletin AS publicBulletin,
+				classification,
+				reg_date AS regDate,
+				table_name AS tableName,
+				status,
+				is_ns as isNs,
+				is_qtd as isQtd
+		FROM	TB_PROJECTS
+		WHERE	id = #{id}
+	</select>
+	
+	<update id="updateProjectClassification">
+		UPDATE	TB_PROJECTS
+		SET		classification = #{dept}
+		WHERE	id = #{id}
+	</update>
+	
+	<select id="getClassification" resultType="com.patent.web.project.domain.Classification">
+		SELECT	id, parent_id AS parentId, name, code
+		FROM	TB_classification
+		WHERE	project_id = #{projectId}
+		ORDER BY id ASC
+	</select>
+	
+	<select id="getClassificationById" resultType="com.patent.web.project.domain.Classification">
+		SELECT	id, parent_id AS parentId, name, code
+		FROM	TB_classification
+		WHERE	id = #{id}
+	</select>
+	
+	<insert id="insertClassification">
+		<selectKey keyProperty ="id" resultType="Integer" order="BEFORE">
+			SELECT	nextval('SEQ_CLASSIFICATION');
+		</selectKey>
+		
+		INSERT INTO TB_CLASSIFICATION
+					(id, parent_id, name, project_id, dept, code)
+		VALUES		(#{id}, #{parentId}, #{name}, #{projectId}, #{dept}, #{code})
+	</insert>
+	
+	<update id="updateClassification">
+		UPDATE TB_CLASSIFICATION SET name = #{name}, code=#{code} WHERE id = #{id}
+	</update>
+	
+	<delete id="deleteAllClassification">
+		DELETE FROM	TB_CLASSIFICATION
+		WHERE		project_id = #{id}
+	</delete>
+	
+	<delete id="deleteClassification">
+		DELETE FROM TB_CLASSIFICATION WHERE id IN (
+			WITH RECURSIVE tmp AS (
+				SELECT	array[id] AS hierarchy, id, parent_id
+				FROM	TB_CLASSIFICATION
+				WHERE	id = #{id}
+				
+				UNION ALL
+				
+				SELECT  tmp.hierarchy || a.id, a.id, a.parent_id
+				FROM    TB_CLASSIFICATION a
+				INNER JOIN  tmp
+				ON    tmp.id = a.parent_id
+			)
+			SELECT	id
+			FROM	tmp
+		)
+	</delete>
+	
+	<select id="getClassificationInfos" resultType="com.patent.web.project.domain.ClassificationInfo">
+		SELECT ca.id, ci.search, ci.remarks
+		FROM (SELECT * FROM TB_PROJECTS WHERE id = #{id}) pr
+		INNER JOIN TB_CLASSIFICATION ca
+		ON pr.id = ca.project_id and pr.classification-1 = ca.dept
+		INNER JOIN TB_CLASSIFICATION_INFO ci
+		ON ca.id = ci.id
+	</select>
+	
+	<select id="getPatents" resultType="com.patent.web.project.domain.Patent">
+		SELECT	id, NMITN, RMKS, RTVCLS
+		FROM	TB_${tableName}
+		WHERE	clss_id = #{id} and stp_dpn='0'
+		ORDER BY id ASC
+	</select>
+	
+	<select id="getClassificationInfo" resultType="com.patent.web.project.domain.ClassificationInfo">
+		SELECT	TC.name, TC.code, TCI.id, TCI.search, TCI.remarks
+		FROM	TB_CLASSIFICATION TC
+		INNER JOIN TB_CLASSIFICATION_INFO TCI
+		ON TC.id = TCI.id  AND TCI.id = #{id}
+	</select>
+	
+	<insert id="insertClassificationInfo">
+		INSERT INTO	TB_CLASSIFICATION_INFO
+					(id, search, remarks)
+		VALUES		(#{id}, #{search}, #{remarks})
+		ON CONFLICT (id) DO UPDATE 
+		SET	search = #{search},
+			remarks = #{remarks}
+	</insert>
+	
+	<select id="getClassificationFiles" resultType="com.patent.web.domain.PatentFile">
+		SELECT	id, org_name AS orgname, save_name AS savename
+		FROM	TB_CLASSIFICATION_FILE
+		WHERE	parent_id = #{id}
+	</select>
+	
+	<select id="getClassificationFilesByProjectId" resultType="com.patent.web.domain.PatentFile">
+		SELECT	id, org_name AS orgname, save_name AS savename, parent_id AS parentId
+		FROM	TB_CLASSIFICATION_FILE
+		WHERE	project_id = #{id}
+	</select>
+	
+	<insert id="insertClassificationFile">
+		<selectKey keyProperty ="id" resultType="Integer" order="BEFORE">
+			SELECT	nextval('SEQ_CLASSIFICATION_FILE');
+		</selectKey>
+		
+		INSERT INTO	TB_CLASSIFICATION_FILE
+					(parent_id, id, org_name, save_name, project_id)
+		VALUES		(#{parentId}, #{id}, #{orgname}, #{savename}, #{projectId})
+		ON CONFLICT (id) DO UPDATE
+		SET	org_name = #{orgname},
+			save_name	= #{savename}
+	</insert>
+	
+	<delete id="deleteClassificationFile">
+		DELETE FROM	TB_CLASSIFICATION_FILE
+		WHERE	id = #{id}
+	</delete>
+	
+	<delete id="deleteAllPatent">
+		DELETE FROM	TB_${tableName}
+	</delete>
+	
+	<update id="updateProjectStep1">
+		UPDATE	TB_PROJECTS
+		SET		name = #{name}, 
+				bulletin = #{bulletin},
+				reg_bulletin = #{regBulletin}, 
+				public_bulletin = #{publicBulletin}, 
+				classification = #{classification}, 
+				reg_date = #{regDate},
+				is_ns=0, is_qtd=0
+		WHERE	id = #{id}
+	</update>
+	
+	<insert id="insertIntoPatentInfos">
+		INSERT INTO	TB_${tableName}
+		VALUES	<foreach item="patent" index="index" collection="list" open="" separator="," close=""> 
+				</foreach>
+	</insert>
+
+	<select id="getUnification" resultType="String">
+		select unfcn from tb_aplct_unfcn where name = #{APLCT}
+	</select>
+	
+	<insert id="insertIntoPatentInfo">
+		INSERT INTO	TB_${tableName}
+					(project_id, file_id, clss_id, clss1, clss2, clss3, id, NAT, DBT, PTT, DCT, NMITN, NMITN2, RMKS, RMKS2, RTVCLS, RTVCLS2, CLNM, MEMO, APPNM, APPNMURL, DTRL, TRNSDTSB, PUBNM, PUBDT, ANMTNM, ANMTDT, RGSTNM, RGSTDT, PBLSDT, APLCT, APLCT2, APLCTNAT, APLCTNM, CRPA, CRPAEN, CRPAKO, ORGAPLCT, APLCTIDNT, INV, INV2, INVNAT, INVNM, AGNT, PRTNM, PRTNAT, PRTDT, HGSTPRAPPNM, HGSTPRNAT, HGSTPRDTRL, INTAPPNM, INTDTRL, INTPUBNM, INTPUBDT, DSNGNATCD, EPCDSNGNATCD, ORGCPCMN, ORGCPCALL, ORGIPCMN, ORIIPCALL, ORGUSCSMN, ORGUSCSALL, ORGFI, FTRM, ORGTHMCD, CRRTCPCMN, CRRTCPCALL, CRRTIPCMN, CRRTIPCALL, CRRTUSCSMN, CRRTUSCSALL, CRRTFI, CRRTFTRM, QTNNMB1, QTNNMEXM, QTNEXMB1, NSPCRFS, QTNNMF1, QTNNMFE, QTNEXMF1, EPOAPPNM, EPOFMLYDOCNM, FMLYBPAPPNM, FMLYAPPNM, FMLYNM, FMLYNATDOCNM, FMLYNATNM, STS, USSTS, DSED, CRTATH, CRTATH2, CARFC, NCRRNEN, NCRRNKR, DOCDB, ORGLK, LKORGTXT, VWLK, VWLKLGN, REPDRW, DRWNM, USRCLSFTAG, ISAPPNM, ISBLLTN, WNSKY, ori_aplct, mody_cnt_aplct)
+		VALUES		(#{projectId}, #{fileId}, #{clssId}, #{strclss1}, #{strclss2}, #{strclss3}, nextval('SEQ_${tableName}'), #{NAT}, #{DBT}, #{PTT}, #{DCT}, #{NMITN}, #{NMITN2}, #{RMKS}, #{RMKS2}, #{RTVCLS}, #{RTVCLS2}, #{CLNM}, #{MEMO}, #{APPNM}, #{APPNMURL}, #{DTRL}, #{TRNSDTSB}, #{PUBNM}, #{PUBDT}, #{ANMTNM}, #{ANMTDT}, #{RGSTNM}, #{RGSTDT}, #{PBLSDT}, #{APLCT}, #{APLCT2}, #{APLCTNAT}, #{APLCTNM}, #{CRPA}, #{CRPAEN}, #{CRPAKO}, #{ORGAPLCT}, #{APLCTIDNT}, #{INV}, #{INV2}, #{INVNAT}, #{INVNM}, #{AGNT}, #{PRTNM}, #{PRTNAT}, #{PRTDT}, #{HGSTPRAPPNM}, #{HGSTPRNAT}, #{HGSTPRDTRL}, #{INTAPPNM}, #{INTDTRL}, #{INTPUBNM}, #{INTPUBDT}, #{DSNGNATCD}, #{EPCDSNGNATCD}, #{ORGCPCMN}, #{ORGCPCALL}, #{ORGIPCMN}, #{ORIIPCALL}, #{ORGUSCSMN}, #{ORGUSCSALL}, #{ORGFI}, #{FTRM}, #{ORGTHMCD}, #{CRRTCPCMN}, #{CRRTCPCALL}, #{CRRTIPCMN}, #{CRRTIPCALL}, #{CRRTUSCSMN}, #{CRRTUSCSALL}, #{CRRTFI}, #{CRRTFTRM}, #{QTNNMB1}, #{QTNNMEXM}, #{QTNEXMB1}, #{NSPCRFS}, #{QTNNMF1}, #{QTNNMFE}, #{QTNEXMF1}, #{EPOAPPNM}, #{EPOFMLYDOCNM}, #{FMLYBPAPPNM}, #{FMLYAPPNM}, #{FMLYNM}, #{FMLYNATDOCNM}, #{FMLYNATNM}, #{STS}, #{USSTS}, #{DSED}, #{CRTATH}, #{CRTATH2}, #{CARFC}, #{NCRRNEN}, #{NCRRNKR}, #{DOCDB}, #{ORGLK}, #{LKORGTXT}, #{VWLK}, #{VWLKLGN}, #{REPDRW}, #{DRWNM}, #{USRCLSFTAG}, #{ISAPPNM}, #{ISBLLTN}, #{WNSKY}, #{oriAPLCT}, #{modyCntAPLCT})
+	</insert>
+	
+	<delete id="deletePatentInfos">
+		DELETE FROM	TB_${tableName}
+		WHERE		file_id = #{fileId}
+	</delete>
+	
+	<insert id="insertUnificationPatent">
+		insert into tb_project_unfcn (id, unfcn, cnt) values (#{id}, #{unfcn}, #{cnt})
+	</insert>
+	
+	<delete id="deleteAllUnificationPatent">
+		delete from tb_project_unfcn where id = #{id}
+	</delete>
+	
+	<select id="getDuplicatePatentAppnm" resultType="com.patent.web.project.domain.Patent">
+		WITH tmp AS (
+			select min(id) as id from tb_${tableName} where stp_dpn='0' group by clss_id, nat, appnm, dct having count(clss_id)>1
+		)
+		select	dt.id, dt.nat, dt.appnm, dt.appnmurl, dt.dct, dt.rmks from	tmp inner join tb_${tableName} dt on tmp.id = dt.id
+	</select>
+	
+	<select id="getDplicationClassificaitonInfo" resultType="com.patent.web.project.domain.Patent">
+		WITH RECURSIVE tmp AS (
+			with cf_tmp AS (
+				select dt.id as patentId, cf.* from tb_${tableName} dt inner join tb_classification_file cf on dt.file_id = cf.id and dt.appnm = #{appnm} and dt.dct = #{dct} and dt.stp_dpn='0'
+			), cf_tmp2 AS (
+				select cf_tmp.patentId, cf.* from cf_tmp inner join tb_classification cf on cf_tmp.parent_id = cf.id
+			)
+			select  patentId, parent_id, id, name, array[id] AS hierarchy from cf_tmp2
+			
+			UNION ALL
+			
+			select tmp.patentId, a.parent_id, a.id, a.name, tmp.hierarchy || a.id from tb_classification a INNER JOIN  tmp on tmp.parent_id = a.id
+		)
+		select patentId as id, ARRAY_TO_STRING(ARRAY(SELECT name FROM tmp WHERE a.patentId = tmp.patentId ORDER BY tmp.id ASC), '-') as classification from tmp a group by patentId order by patentId asc
+	</select>
+	
+	<update id="updateProjectDuplicateAppnm">
+		UPDATE	TB_PROJECTS
+		SET		duplicate_patent = #{duplicate},
+				duplicate_aplct = #{aplct},
+				status = 2
+		WHERE	id = #{projectId}
+	</update>
+	
+	<update id="updateDuplicatePatentByAppnm">
+		UPDATE	TB_${tableName}
+		SET		stp_dpn=1
+		WHERE	id IN <foreach item="id" index="index" collection="ids" open="(" separator="," close=")">#{id}</foreach>
+	</update>
+	
+	<update id="updateClassificationFileDone">
+		UPDATE	TB_CLASSIFICATION_FILE
+		SET		reflt = '1'
+		WHERE	project_id = #{projectId}
+	</update>
+	
+	<select id="getDuplicateProject" resultType="Integer">
+		select count(*) from tb_${tableName} where stp_dpn=1
+	</select>
+	
+	<select id="getUnificationProjectCnt" resultType="Integer">
+		select sum(cnt) from tb_project_unfcn where id = #{id}
+	</select>
+	<select id="getUnificationProject" resultType="String">
+		select unfcn from tb_project_unfcn where id = #{id} order by cnt desc limit 5
+	</select>
+	
+	<select id="getDuplicatePatentListSize" resultType="Integer">
+		SELECT COUNT(id) FROM TB_${tableName} where stp_dpn='0' and stp_fml='0' and stp_qtd='0' <if test="search != null"> and (clss1 like '%${search}%' or clss2 like '%${search}%' or clss3 like '%${search}%' or nat like '%${search}%' or ptt like '%${search}%' or appnm like '%${search}%' or nmitn like '%${search}%' or aplct like '%${search}%') </if>
+	</select>
+	
+	<select id="getDuplicatePatentList" resultType="com.patent.web.project.domain.Patent">
+		select clss1 as strclss1, clss2 as strclss2, clss3 as strclss3, PTT, NAT, NMITN, APPNM, APPNMURL, APLCT, STS 
+		from tb_${tableName} where stp_dpn='0' and stp_fml='0' and stp_qtd='0' 
+		<if test="search != null"> and (clss1 like '%${search}%' or clss2 like '%${search}%' or clss3 like '%${search}%' or nat like '%${search}%' or ptt like '%${search}%' or appnm like '%${search}%' or nmitn like '%${search}%' or aplct like '%${search}%') </if>
+		order by id asc limit #{onepagelstcnt} offset #{offset}
+	</select>
+	
+	<select id="getTotalClmns" resultType="com.patent.web.project.domain.CLMN">
+		SELECT	id, name, mthd, type
+		FROM	TB_CLMN_CODE
+		ORDER BY name ASC
+	</select>
+	
+	<select id="getTotalClmns2" resultType="com.patent.web.project.domain.CLMN">
+		SELECT	id, name2 as name, mthd, type
+		FROM	TB_CLMN_CODE
+		WHERE	name2 is not null
+		ORDER BY name2 ASC
+	</select>
+	
+	<delete id="deletePatentClmns">
+		delete from tb_project_clmns where project_id = #{id}	
+	</delete>
+	<insert id="insertPatentClmns">
+		INSERT INTO	TB_PROJECT_CLMNS
+					(project_id, clmn_id, clmn_ordr)
+		VALUES		(#{id}, #{clmnId}, #{ordr})
+		ON CONFLICT (project_id, clmn_id) DO NOTHING;
+	</insert>
+	
+	<select id="getClssTree" resultType="com.patent.web.project.domain.ClssTree">
+		with recursive tree as (
+			select id, parent_id, name, array[id] as hy, 1 as depth, array[name] as hyn from tb_classification where project_id = #{id}
+			
+			union all
+			
+			select cf.id, cf.parent_id, cf.name, tree.hy || cf.id, tree.depth + 1, tree.hyn || cf.name from tb_classification cf inner join tree on cf.parent_id = tree.id
+		)
+		select id, hyn[1] as clss1<if test="dept > 1">, hyn[2] as clss2</if><if test="dept == 3">, hyn[3] as clss3</if> from tree where depth = #{dept}
+	</select>
+	
+	<select id="getDuplicatePatentByClssId" resultType="com.patent.web.project.domain.Patent">
+		select NAT, APPNM, #{tableName} as tableName, #{clssId} as clssId from tb_${tableName} where stp_dpn='0' and clss_id=#{clssId} group by nat, appnm having count(*) > 1
+	</select>
+	<select id="getDuplicatePatent2" resultType="com.patent.web.project.domain.Patent">
+		select id, DCT, APPNM, APLCT, #{tableName} as tableName from tb_${tableName} where NAT=#{NAT} and APPNM=#{APPNM} and stp_dpn='0' and clss_id=#{clssId}
+	</select>
+	<update id="updateDuplicatePatent">
+		update tb_${tableName} set stp_dpn=1 where id=#{id}
+	</update>
+	<select id="getDuplicatePatentInfo" resultType="com.patent.web.project.domain.Patent">
+		select NAT, APPNM, DCT from tb_${tableName} where stp_dpn='0' group by nat, appnm, dct
+	</select>
+	<select id="getDuplicatePatentForClssId" resultType="com.patent.web.project.domain.Patent">
+		select NAT, APPNM, DCT, #{tableName} as tableName from tb_${tableName} where stp_dpn='0' group by nat, appnm, dct having count(clss_id) > 1
+	</select>
+	<select id="getDuplicatePatentForClssId2" resultType="com.patent.web.project.domain.Patent">
+		select id, clss_id, NAT, APPNM, DCT, RMKS, concat(clss1, case when clss2 is not null then '-' || clss2 end, case when clss3 is not null then '-' || clss3 end) as classification
+		from tb_${tableName}
+		where stp_dpn='0' and nat=#{NAT} and dct=#{DCT} and appnm=#{APPNM}
+	</select>
+	
+	
+	
+	<select id="getDuplicatePatent" resultType="com.patent.web.project.domain.Patent">
+		select id, clss_id as clssId, nat, dct, appnm
+		from tb_${tableName}
+		where id = #{id}
+	</select>
+	
+	<update id="updateDuplicatePatentByIds">
+		UPDATE	TB_${tableName}
+		SET		stp_dpn=1
+		WHERE	id IN <foreach item="idx" collection="deleteList" open="(" separator="," close=")"> #{idx} </foreach>
+	</update>
+	
+<!-- 	/******************************************************************************************************************/ -->
+<!-- 	// STEP2 -->
+<!-- 	/******************************************************************************************************************/ -->
+	<select id="getProjectInfo2" resultType="com.patent.web.project.domain.ProjectStep2">
+		SELECT	id, coalesce(noise, 10) as noise, status, is_ns as isNs
+		FROM	TB_PROJECTS
+		WHERE	id = #{id}
+	</select>
+	
+	<update id="updateProjectStep2">
+		UPDATE	TB_PROJECTS
+		SET		noise = #{noise}, is_qtd=0
+		WHERE	id = #{id}
+	</update>
+	
+	<select id="getTmpNoiseList" resultType="com.patent.web.project.domain.Patent">
+		select id, PTT, NAT, DCT, NMITN, APPNM, APPNMURL, APLCT, STS, RMKS, RTVCLS
+		from tb_${tableName}
+		where id in <foreach item="id" index="index" collection="list" open="(" separator="," close=")">#{id}</foreach>
+	</select>
+	
+	<select id="getTmpNoiseInfo" resultType="com.patent.web.project.domain.Patent">
+		select id, PTT, NAT, DCT, NMITN, APPNM, APPNMURL, APLCT, STS, RMKS, RTVCLS
+		from tb_${tableName} where id = #{id}
+	</select>
+	
+	<update id="updateNoiseCompleate">
+		update tb_${tableName}
+		set stp_ns1='1'
+		where id not in <foreach item="id" index="index" collection="list" open="(" separator="," close=")">#{id}</foreach>
+	</update>
+	
+	<update id="updateStep2Check">
+		update tb_projects set is_ns=1, is_qtd=0 where id=#{id}
+	</update>
+	
+	<select id="getNoisePatents" resultType="com.patent.web.project.domain.Patent">
+		SELECT	id, PTT, NAT, DCT, NMITN, APPNM, APPNMURL, APLCT, STS, RMKS FROM TB_${tableName}
+		WHERE	stp_dpn='0' AND stp_ns1='0' <choose><when test="ln == 1">AND	NAT = 'KR'</when><when test="ln == 2">AND	NAT != 'KR'</when></choose> 
+	</select>
+	
+	<update id="clearNoise">
+		UPDATE	TB_${tableName}
+		SET		stp_ns1 = '0', stp_ns2 = '0'
+		WHERE	id > 0
+	</update>
+	
+	<update id="updateNoise">
+		UPDATE	TB_${tableName}
+		SET		stp_ns1 = '1'
+		WHERE	id IN <foreach item="id" index="index" collection="ids" open="(" separator="," close=")">#{id}</foreach>
+	</update>
+	
+	<select id="getFinalNoisePatentListSize" resultType="Integer">
+		SELECT COUNT(id) FROM TB_${tableName} where stp_dpn='0' and stp_ns1='0' and stp_fml='0' and stp_qtd='0' <if test="search != null"> and (clss1 like '%${search}%' or clss2 like '%${search}%' or clss3 like '%${search}%' or nat like '%${search}%' or ptt like '%${search}%' or appnm like '%${search}%' or nmitn like '%${search}%' or aplct like '%${search}%') </if>
+	</select>
+	
+	<select id="getFinalNoisePatentList" resultType="com.patent.web.project.domain.Patent">
+		select clss1 as strclss1, clss2 as strclss2, clss3 as strclss3, PTT, NAT, NMITN, APPNM, APPNMURL, APLCT, STS 
+		from tb_${tableName} where stp_dpn='0' and stp_ns1='0' and stp_fml='0' and stp_qtd='0' <if test="search != null"> and (clss1 like '%${search}%' or clss2 like '%${search}%' or clss3 like '%${search}%' or nat like '%${search}%' or ptt like '%${search}%' or appnm like '%${search}%' or nmitn like '%${search}%' or aplct like '%${search}%') </if>
+		order by id asc limit #{onepagelstcnt} offset #{offset}
+	</select>
+	
+	
+
+<!-- 	/******************************************************************************************************************/ -->
+<!-- 	// STEP3 -->
+<!-- 	/******************************************************************************************************************/ -->
+	<select id="getProjectInfo3" resultType="com.patent.web.project.domain.ProjectStep3">
+		SELECT	id, status, qtd AS quoted, is_qtd as isQtd
+		FROM	TB_PROJECTS
+		WHERE	id = #{id}
+	</select>
+	
+	<update id="updateProjectStep3">
+		UPDATE	TB_PROJECTS
+		SET		qtd = #{quoted}
+		WHERE	id = #{id}
+	</update>
+	
+	<delete id="deleteOmissionPatent" >
+		delete from tb_${tableName} where stp_qtd='1' <if test="status lt 6"> or stp_fml='1'</if>
+	</delete>
+	<update id="updateDeleteOmissionDuplicatePatent">
+		update tb_${tableName} set stp_dpn='0' where stp_dpn=2
+	</update>
+	<select id="getTmpOmissionFamilyPatent" resultType="com.patent.web.project.domain.Patent">
+		with info as (
+			select nat from tb_${tableName} group by nat
+		), rdata as (
+			select clss_id, id, nat, upper(trim(unnest(string_to_array(epoappnm, '|')))) as epoappnm from tb_${tableName} dt where stp_dpn='0' and stp_ns1='0'
+		), fdata2 as (
+			select clss_id, id, nat, epoappnm, UNNEST(REGEXP_MATCHES(epoappnm, '[a-zA-Z]*')) AS eponat, UNNEST(REGEXP_MATCHES(epoappnm, '\d\d*-?\d\d*-?\d\d*')) as epoapp from rdata
+		), fdata as (
+			select fdata2.clss_id, fdata2.eponat, fdata2.epoapp from fdata2 inner join info on info.nat = fdata2.eponat and fdata2.nat != fdata2.eponat group by fdata2.clss_id, fdata2.eponat, fdata2.epoapp
+		)
+		select clss_id AS clssId, eponat as nat, epoapp as appnm from fdata where not exists (select fdata.* from tb_${tableName} dt where fdata.eponat = dt.nat and (fdata.epoapp = dt.appnm or fdata.epoapp = dt.pubnm or fdata.epoapp = dt.anmtnm or fdata.epoapp = dt.rgstnm))
+	</select>
+	<select id="getCheckOmissionPatent" resultType="Integer">
+		select count(id) from tb_${tableName}
+		where nat=#{nat} and (appnm=#{appnm} or pubnm=#{appnm} or anmtnm=#{appnm} or rgstnm=#{appnm} or appnm=#{appnm2} or pubnm=#{appnm2} or anmtnm=#{appnm2} or rgstnm=#{appnm2})
+	</select>
+	<insert id="insertOmissionFamilyPatent">
+		insert into tb_${tableName}_omssn
+					(id, type, clss_id, ptnt_id, ptnt_nat, epoappnm, nat, appnm)
+		
+		select nextval('SEQ_${tableName}'), 1, dt.clss_id, dt.id, dt.nat, dt.epoappnm, dt.eponat, dt.epoapp from dt
+		inner join info on info.nat = dt.eponat and info.appnm != dt.epoapp and info.pubnm != dt.epoapp and info.anmtnm != dt.epoapp and info.rgstnm != dt.epoapp
+	</insert>
+	<select id="getOmissionFamilyPatent" resultType="com.patent.web.project.domain.Patent">
+		select clss_id as parentId, min(id) as id, nat, appnm
+		from tb_${tableName}_omssn
+		where type = 1 group by clss_id, nat, appnm order by nat asc, appnm asc
+	</select>
+	
+	<select id="getTmpOmissionQuotedPatent" resultType="com.patent.web.project.domain.Patent">
+		with info as (
+			select nat from tb_${tableName} group by nat
+		), rdata as (
+			select clss_id, id, nat, upper(trim(unnest(string_to_array(qtnnmexm, '|')))) as epoappnm from tb_${tableName} dt where stp_dpn='0' and stp_ns1='0'
+		), fdata2 as (
+			select clss_id, id, nat, epoappnm, UNNEST(REGEXP_MATCHES(epoappnm, '[a-zA-Z]*')) AS eponat, UNNEST(REGEXP_MATCHES(epoappnm, '\d\d*-?\d\d*-?\d\d*')) as epoapp from rdata
+		), fdata as (
+			select fdata2.clss_id, fdata2.eponat, fdata2.epoapp from fdata2 inner join info on info.nat = fdata2.eponat group by fdata2.clss_id, fdata2.eponat, fdata2.epoapp having count(clss_id) >= #{quoted}
+		)
+		select clss_id AS clssId, eponat as nat, epoapp as appnm from fdata where not exists (select fdata.* from (select nat, pubnm, anmtnm, rgstnm, appnm from tb_${tableName}) dt where fdata.eponat = dt.nat and (fdata.epoapp = dt.appnm or fdata.epoapp = dt.pubnm or fdata.epoapp = dt.anmtnm or fdata.epoapp = dt.rgstnm))
+	</select>
+	<insert id="insertOmissionCitationPatent">
+		insert into tb_${tableName}_omssn
+					(id, type, clss_id, ptnt_id, ptnt_nat, epoappnm, nat, appnm)
+		with info as (
+			select nat, appnm, pubnm, anmtnm, rgstnm
+			from tb_${tableName}
+			group by nat, appnm, pubnm, anmtnm, rgstnm
+		), rdata as (
+			select file_id, id, nat, upper(trim(unnest(string_to_array(qtnnmexm, '|')))) as qtnnmexm
+			from tb_${tableName} dt
+			where stp_dpn='0' and stp_ns1='0'
+		), fdata2 as (
+			select file_id, id, nat, qtnnmexm, UNNEST(REGEXP_MATCHES(qtnnmexm, '[a-zA-Z]*')) AS eponat, UNNEST(REGEXP_MATCHES(qtnnmexm, '\d\d\d\S*\d\d\d')) as epoapp
+			from rdata
+		), fdata as (
+			select file_id, id, nat, qtnnmexm, eponat, epoapp
+			from fdata2
+			where nat != eponat
+		), dt as (
+			select cf.parent_id as clss_id, fdata.id, fdata.nat, fdata.qtnnmexm, fdata.eponat, fdata.epoapp
+			from fdata
+			inner join tb_classification_file cf
+			on cf.id = fdata.file_id
+		)
+		select nextval('SEQ_${tableName}'), 2, dt.clss_id, dt.id, dt.nat, dt.qtnnmexm, dt.eponat, dt.epoapp
+		from dt
+		inner join info
+		on info.nat = dt.eponat
+		and info.appnm != dt.epoapp
+		and info.pubnm != dt.epoapp
+		and info.anmtnm != dt.epoapp
+		and info.rgstnm != dt.epoapp	
+	</insert>
+	<select id="getOmissionCitationPatent" resultType="com.patent.web.project.domain.Patent">
+		select nat, appnm
+		from tb_${tableName}_omssn
+		where type = 2
+		group by nat, appnm
+		having count(*) >= #{quoted}
+		order by nat asc, appnm asc
+	</select>
+	<select id="getOmissionCitationPatentClssId" resultType="Integer">
+		with rdata as (
+			select	clss_id, rank() OVER (PARTITION BY clss_id ORDER BY COUNT(*) DESC) AS rnk
+			from tb_${tableName}_omssn
+			where type = 2 and nat = #{NAT} and appnm = #{APPNM}
+			group by clss_id
+		)
+		select clss_id from rdata where rnk = 1 order by clss_id asc limit 1
+	</select>
+	
+	<insert id="insertTmpPatentInfo">
+		<selectKey keyProperty="id" resultType="Integer" order="BEFORE">
+			select nextval('SEQ_${tableName}')
+		</selectKey>
+	  
+		INSERT INTO	TB_${tableName}
+					(project_id, file_id, clss_id, clss1, clss2, clss3, id, NAT, DBT, PTT, DCT, NMITN, NMITN2, RMKS, RMKS2, RTVCLS, RTVCLS2, CLNM, MEMO, APPNM, APPNMURL, DTRL, TRNSDTSB, PUBNM, PUBDT, ANMTNM, ANMTDT, RGSTNM, RGSTDT, PBLSDT, APLCT, APLCT2, APLCTNAT, APLCTNM, CRPA, CRPAEN, CRPAKO, ORGAPLCT, APLCTIDNT, INV, INV2, INVNAT, INVNM, AGNT, PRTNM, PRTNAT, PRTDT, HGSTPRAPPNM, HGSTPRNAT, HGSTPRDTRL, INTAPPNM, INTDTRL, INTPUBNM, INTPUBDT, DSNGNATCD, EPCDSNGNATCD, ORGCPCMN, ORGCPCALL, ORGIPCMN, ORIIPCALL, ORGUSCSMN, ORGUSCSALL, ORGFI, FTRM, ORGTHMCD, CRRTCPCMN, CRRTCPCALL, CRRTIPCMN, CRRTIPCALL, CRRTUSCSMN, CRRTUSCSALL, CRRTFI, CRRTFTRM, QTNNMB1, QTNNMEXM, QTNEXMB1, NSPCRFS, QTNNMF1, QTNNMFE, QTNEXMF1, EPOAPPNM, EPOFMLYDOCNM, FMLYBPAPPNM, FMLYAPPNM, FMLYNM, FMLYNATDOCNM, FMLYNATNM, STS, USSTS, DSED, CRTATH, CRTATH2, CARFC, NCRRNEN, NCRRNKR, DOCDB, ORGLK, LKORGTXT, VWLK, VWLKLGN, REPDRW, DRWNM, USRCLSFTAG, ISAPPNM, ISBLLTN, WNSKY, ori_aplct, mody_cnt_aplct, stp_fml, stp_qtd)
+		VALUES		(#{projectId}, #{fileId}, #{clssId}, #{strclss1}, #{strclss2}, #{strclss3}, #{id}, #{NAT}, #{DBT}, #{PTT}, #{DCT}, #{NMITN}, #{NMITN2}, #{RMKS}, #{RMKS2}, #{RTVCLS}, #{RTVCLS2}, #{CLNM}, #{MEMO}, #{APPNM}, #{APPNMURL}, #{DTRL}, #{TRNSDTSB}, #{PUBNM}, #{PUBDT}, #{ANMTNM}, #{ANMTDT}, #{RGSTNM}, #{RGSTDT}, #{PBLSDT}, #{APLCT}, #{APLCT2}, #{APLCTNAT}, #{APLCTNM}, #{CRPA}, #{CRPAEN}, #{CRPAKO}, #{ORGAPLCT}, #{APLCTIDNT}, #{INV}, #{INV2}, #{INVNAT}, #{INVNM}, #{AGNT}, #{PRTNM}, #{PRTNAT}, #{PRTDT}, #{HGSTPRAPPNM}, #{HGSTPRNAT}, #{HGSTPRDTRL}, #{INTAPPNM}, #{INTDTRL}, #{INTPUBNM}, #{INTPUBDT}, #{DSNGNATCD}, #{EPCDSNGNATCD}, #{ORGCPCMN}, #{ORGCPCALL}, #{ORGIPCMN}, #{ORIIPCALL}, #{ORGUSCSMN}, #{ORGUSCSALL}, #{ORGFI}, #{FTRM}, #{ORGTHMCD}, #{CRRTCPCMN}, #{CRRTCPCALL}, #{CRRTIPCMN}, #{CRRTIPCALL}, #{CRRTUSCSMN}, #{CRRTUSCSALL}, #{CRRTFI}, #{CRRTFTRM}, #{QTNNMB1}, #{QTNNMEXM}, #{QTNEXMB1}, #{NSPCRFS}, #{QTNNMF1}, #{QTNNMFE}, #{QTNEXMF1}, #{EPOAPPNM}, #{EPOFMLYDOCNM}, #{FMLYBPAPPNM}, #{FMLYAPPNM}, #{FMLYNM}, #{FMLYNATDOCNM}, #{FMLYNATNM}, #{STS}, #{USSTS}, #{DSED}, #{CRTATH}, #{CRTATH2}, #{CARFC}, #{NCRRNEN}, #{NCRRNKR}, #{DOCDB}, #{ORGLK}, #{LKORGTXT}, #{VWLK}, #{VWLKLGN}, #{REPDRW}, #{DRWNM}, #{USRCLSFTAG}, #{ISAPPNM}, #{ISBLLTN}, #{WNSKY}, #{oriAPLCT}, #{modyCntAPLCT}, '${fmly}', '${qtd}')
+	</insert>
+	<select id="getDefaultOmissionPatent" resultMap="resultIntegerString">
+		with recursive tree as (
+			select id, parent_id, name, array[id] as ids from tb_classification where id = #{id}
+			
+			union all
+			
+			select ct.id, ct.parent_id, ct.name, tree.ids || ct.id from tb_classification ct inner join tree on tree.parent_id = ct.id
+		)
+		select id v1, name as v2 from tree order by id asc
+	</select>
+	<update id="updateDuplicateOmission">
+		update tb_${tableName} set stp_dpn=1 where id in <foreach item="ptid" index="index" collection="list" open="(" separator="," close=")"> #{ptid} </foreach>
+	</update>
+	<update id="updateOmissionClssId">
+		update tb_${tableName} set clss_id = #{clssId}, clss1=#{strclss1}, clss2=#{strclss2}, clss3=#{strclss3} where id = #{id}
+	</update>
+	
+	<select id="getFinalFmlyPatentSize" resultType="Integer">
+		select count(*) from tb_${tableName} where stp_dpn='0' and stp_fml='1' and clss_id != -1
+	</select>
+	<select id="getFinalQtdPatentSize" resultType="Integer">
+		select count(*) from tb_${tableName} where stp_dpn='0' and stp_qtd='1' and clss_id != -1
+	</select>
+	<select id="getIntegrityPatentListSize" resultType="Integer">
+		SELECT count(id) FROM TB_${tableName} WHERE stp_dpn='0' AND stp_ns1='0'  <if test="search != null"> and (clss1 like '%${search}%' or clss2 like '%${search}%' or clss3 like '%${search}%' or nat like '%${search}%' or ptt like '%${search}%' or appnm like '%${search}%' or nmitn like '%${search}%' or aplct like '%${search}%') </if>
+	</select>
+	
+	<select id="getQtdPatent" resultType="com.patent.web.project.domain.NexitPatent">
+		select tmp.id, coalesce(c1.id, -1) as clss1, coalesce(c2.id, -1) as clss2, coalesce(c3.id, -1) as clss3, tmp.NAT, tmp.APPNM, tmp.DCT, tmp.clss_id as clssId, tmp.APPNM, tmp.RMKS, tmp.prvId, tmp.nxtId
+		from (
+			select id, coalesce(lag(id) over w, -1) as prvId, coalesce(lead(id) over w, -1) as nxtId, NAT, DCT, clss_id, APPNM, RMKS
+			from tb_${tableName} where stp_qtd='1' window w as (order by id asc) limit 1 offset #{page}
+		) tmp
+		inner join tb_classification c3 on c3.id = tmp.clss_id
+		left outer join tb_classification c2 on c3.parent_id = c2.id
+		left outer join tb_classification c1 on c2.parent_id = c1.id
+	</select>
+	
+	<select id="getQtdPatentTotalSize" resultType="Integer">
+		select count(id) from tb_${tableName} where stp_qtd='1'
+	</select>
+	
+	<select id="getClassificationNameById" resultType="String">
+		select name from tb_classification where id = #{id}
+	</select>
+	
+	<update id="updateQtdForm">
+		update tb_${tableName} set clss_id = #{clssId}, clss1=#{strclss1}, clss2=#{strclss2}, clss3=#{strclss3} where id = #{id}
+	</update>
+	<update id="updateQtdComplete">
+		update tb_projects set is_qtd=1 where id=#{id}
+	</update>
+	
+	<select id="getIntegrityPatentList" resultType="com.patent.web.project.domain.Patent">
+		select clss1 as strclss1, clss2 as strclss2, clss3 as strclss3, PTT, NAT, NMITN, APPNM, APPNMURL, APLCT, STS 
+		from tb_${tableName} where stp_dpn='0' AND stp_ns1='0' <if test="search != null"> and (clss1 like '%${search}%' or clss2 like '%${search}%' or clss3 like '%${search}%' or nat like '%${search}%' or ptt like '%${search}%' or appnm like '%${search}%' or nmitn like '%${search}%' or aplct like '%${search}%') </if>
+		order by id desc limit #{onepagelstcnt} offset #{offset}
+	</select>
+
+	<select id="getOmissionQuotePatent" resultMap="resultStringString">
+		WITH tmp AS (
+			SELECT id, STRING_TO_ARRAY(QTNNMEXM, '|') AS qtn FROM TB_${tableName} WHERE QTNNMEXM != ''
+		), tmp1 AS (
+			SELECT id, UPPER(TRIM(UNNEST(qtn))) as QTNNMEXM FROM tmp where ARRAY_LENGTH(qtn, 1) > ${num}
+		), tmp2 AS (
+			SELECT id, NAT, APPNM, QTNNMEXM, UNNEST(REGEXP_MATCHES(QTNNMEXM, '\d\d\d\S*\d\d\d')) AS E1, UNNEST(REGEXP_MATCHES(QTNNMEXM, '[a-zA-Z]*')) AS E2, REGEXP_REPLACE(QTNNMEXM, '[a-zA-Z]*\d\d\d\S*\d\d\d', '') AS E3 FROM tmp1
+		), tmp3 AS (
+			SELECT id, QTNNMEXM, E1, E2, E3 FROM tmp2 WHERE NAT != E3
+		), fnl AS (
+			SELECT id, QTNNMEXM, E1, (SELECT COUNT(id) FROM TB_${tableName} A WHERE A.APPNM = tmp3.e2 OR A.ANMTNM = tmp3.e2) AS cnt FROM tmp3
+		)
+		SELECT QTNNMEXM AS v1, E1 AS v2 FROM fnl WHERE cnt = 0
+	</select>
+	
+	<select id="getFirstClassification" resultMap="resultIntegerString">
+		SELECT id AS v1, name AS v2 FROM TB_CLASSIFICATION WHERE project_id = #{id} AND parent_id = -1
+	</select>
+	
+	<select id="getChildClassification" resultMap="resultIntegerString">
+		SELECT id AS v1, name AS v2 FROM TB_CLASSIFICATION WHERE project_id=#{pId} and parent_id = #{id}
+	</select>
+	<select id="getChildClassification2" resultMap="resultIntegerString">
+		SELECT id AS v1, name AS v2 FROM TB_CLASSIFICATION WHERE project_id=#{pId} and dept = #{id}
+	</select>
+
+	<select id="getDuplicateRemotePatent" resultType="com.patent.web.project.domain.Patent">
+		select id, NAT, APPNM, DCT from tb_${tableName} where NAT=#{NAT} and APPNM=#{APPNM} and stp_dpn='0'
+	</select>
+	<select id="deleteUpdateDuplicatePatent">
+		update tb_${tableName} set stp_dpn=2 where id=#{id}
+	</select>
+<!-- 	/******************************************************************************************************************/ -->
+<!-- 	// STEP4 -->
+<!-- 	/******************************************************************************************************************/ -->
+	
+	<select id="getProjectInfo4" resultType="com.patent.web.project.domain.ProjectStep4">
+		select id, table_name as tableName, reg_date as regDate, status, coalesce(stnd, 0, stnd) as stnd, numb, scre, idxrght, idxcntnrght, idxprrty, idxqtd, idxfmly, idxclm from tb_projects where id = #{id}
+	</select>
+	<update id="updateProjectStep4">
+		update tb_projects set stnd=#{stnd}, numb=#{numb}, scre=#{scre}, idxrght=#{idxrght}, idxcntnrght=#{idxcntnrght}, idxprrty=#{idxprrty}, idxqtd=#{idxqtd}, idxfmly=#{idxfmly}, idxclm=#{idxclm} where id=#{id}
+	</update>
+	<select id="getCalcPatent" resultType="com.patent.web.project.domain.Patent">
+		select id, dtrl, rgstdt, rgstnm, prtnm from tb_${tableName} where stp_dpn='0' and stp_ns1='0' order by dtrl asc
+	</select>
+	<select id="getCalcIdxcntnrghtPatent" resultType="com.patent.web.project.domain.Patent">
+		with tmp as ( select (7300-datediff('day', (select max(dtrl) from tb_${tableName} where stp_dpn='0' and stp_ns1='0' and dtrl != '' and dtrl is not null)::date, #{indt}::date)::numeric) as df ) 
+		, clc as (select id, (7300-datediff('day', dtrl::date, #{indt}::date)::numeric) as df from tb_${tableName} where stp_dpn='0' and stp_ns1='0' and dtrl != '' and dtrl is not null )
+		select id, round(df/(select df from tmp)*10::numeric, 3) as idxcntnrght from clc where df > 0 order by df desc;
+	</select>
+	<select id="getCalcQtdPatent" resultType="com.patent.web.project.domain.Index">
+		with tmp as (
+			select max(qtnnmf1)::numeric as mq from tb_${tableName} where stp_dpn='0' and stp_ns1='0'
+		), std as (select case when mq>0 then mq else 1 end as mq from tmp) 
+		select id as key, round(qtnnmf1::numeric/(select * from std)*10::numeric, 3) as fv from tb_${tableName} where stp_dpn='0' and stp_ns1='0' and qtnnmf1 is not null order by qtnnmf1 desc
+	</select>
+	<select id="getCalcFmlyPatent" resultType="com.patent.web.project.domain.Index">
+		with rdata as (
+			select id, unnest(REGEXP_MATCHES(trim(unnest(string_to_array(epofmlydocnm, '|'))), '\d+')) as num
+			from tb_${tableName}
+			where stp_dpn='0' and stp_ns1='0'
+		), data as (
+			select id as key, sum(num::integer) as iv from rdata group by id
+		)
+		, tmp as (select max(iv)::numeric as mv from data)
+		, dt as (select case when mv>0 then mv else 1 end as mv from tmp)
+		select key, round(iv::numeric/(select mv from dt)*10::numeric, 3) as iv from data order by iv desc
+		
+	</select>
+	<select id="getCalcClnmPatent" resultType="com.patent.web.project.domain.Index">
+		with tmp as (
+			select max(clnm)::numeric as mc from tb_${tableName} where stp_dpn='0' and stp_ns1='0'
+		), std as (select case when mc>0 then mc else 1 end as mc from tmp)
+		select id as key, round(clnm::numeric/(select mc from std)*10::numeric, 3) as fv from tb_${tableName} where stp_dpn='0' and stp_ns1='0' and clnm is not null order by clnm desc
+	
+<!-- 		with std as ( -->
+<!-- 			select max(clnm) as mc from tb_${tableName} where stp_dpn='0' and stp_ns1='0' -->
+<!-- 		) -->
+<!-- 		select id as key, coalesce(clnm::float/(select mc from std), 0) as fv from tb_${tableName} where stp_dpn='0' and stp_ns1='0' -->
+	</select>
+	<update id="clearScr">
+		update tb_${tableName} set scr=0, idxrght=0, idxcntnrght=0, idxprrty=0, idxqtd=0, idxfmly=0, idxclm=0
+	</update>
+	<update id="updateCalcPatent">
+		update tb_${tableName} set scr=#{scr}, idxrght=#{idxrght}, idxcntnrght=#{idxcntnrght}, idxprrty=#{idxprrty}, idxqtd=#{idxqtd}, idxfmly=#{idxfmly}, idxclm=#{idxclm} where id=#{id}
+	</update>
+	<select id="getRcmndPatent" resultType="com.patent.web.project.domain.Index">
+		select id as key from ( select id, scr, row_number() over (order by scr desc) from tb_${tableName} where stp_dpn='0' and stp_ns1='0') t
+		where <if test="stnd==0">${numb}>=row_number</if> <if test="stnd==1">scr>=${scre}</if>
+<!-- 		with std as ( -->
+<!-- 			select id, idxrght, idxcntnrght, idxprrty, idxqtd, idxfmly, idxclm from tb_projects where id = #{id} -->
+<!-- 		), rdata as ( -->
+<!-- 			select dt.id, dt.idxrght*std.idxrght+dt.idxcntnrght*std.idxcntnrght+dt.idxprrty*std.idxprrty+dt.idxqtd*std.idxqtd+dt.idxfmly*std.idxfmly+dt.idxclm*std.idxclm as scre from tb_${tableName} dt inner join std on dt.stp_dpn='0' and (dt.stp_ns1='0' or dt.stp_ns2='0') and std.id=dt.project_id -->
+<!-- 		), rt as ( -->
+<!-- 			select id, scre, ROW_NUMBER() OVER(order by scre desc) AS rn from rdata order by scre desc, rn asc -->
+<!-- 		) -->
+<!-- 		select id as key from rt where <if test="stnd==0">${numb}>=rn</if> <if test="stnd==1">scre>=${scre}</if> -->
+	</select>
+	<update id="updateClearCalcRtPatent">
+		update tb_${tableName} set stp_rcmnd = '0' where stp_rcmnd = '1'
+	</update>
+	<update id="updateCalcRtPatent">
+		update tb_${tableName} set stp_rcmnd = '1' where id = #{key}
+	</update>
+	
+	<select id="getRcmndPatentListSize" resultType="Integer">
+		SELECT COUNT(id) FROM TB_${tableName} WHERE stp_dpn='0' and stp_ns1='0' and stp_rcmnd='1' <if test="search != null"> and (clss1 like '%${search}%' or clss2 like '%${search}%' or clss3 like '%${search}%' or nat like '%${search}%' or ptt like '%${search}%' or appnm like '%${search}%' or nmitn like '%${search}%' or aplct like '%${search}%') </if>
+	</select>
+	
+	<select id="getRcmndPatentList" resultType="com.patent.web.project.domain.Patent">
+		select clss1 as strclss1, clss2 as strclss2, clss3 as strclss3, PTT, NAT, NMITN, APPNM, APPNMURL, APLCT, STS, scr 
+		from tb_${tableName} where stp_dpn='0' and stp_ns1='0' and stp_rcmnd='1' <if test="search != null"> and (clss1 like '%${search}%' or clss2 like '%${search}%' or clss3 like '%${search}%' or nat like '%${search}%' or ptt like '%${search}%' or appnm like '%${search}%' or nmitn like '%${search}%' or aplct like '%${search}%') </if>
+		order by scr desc limit #{onepagelstcnt} offset #{offset}
+	</select>
+	
+	
+<!-- 	/******************************************************************************************************************/ -->
+<!-- 	// STEP5 -->
+<!-- 	/******************************************************************************************************************/ -->
+
+	<select id="getProjectInfo5" resultType="com.patent.web.project.domain.ProjectStep5">
+		select id, ipt1, ipt2, ipt3, ipt31, ipt4, ipt5, ipt6, ipt61, ipt7, ipt8, ipt9, ipt10, tmp_org_nm AS orgName, tmp_sv_nm AS saveName, tmp_fnl_nm AS fnlName, table_name AS tableName from tb_projects where id=#{id}
+	</select>
+	
+	<select id="getPatentDateInfo" resultType="Integer">
+		with tmp as ( select EXTRACT(year from dtrl::TIMESTAMP) as dtrl from tb_${tableName} where dtrl != 'error' and dtrl != '' and dtrl is not null and stp_dpn='0' and stp_ns1='0' and stp_rcmnd='1')
+		select case when extract(year from current_timestamp) = max(dtrl) then max(dtrl)-min(dtrl)-1 else max(dtrl)-min(dtrl) end from tmp
+	</select>
+	
+	<select id="getProjectInfo5Chart" resultType="com.patent.web.project.domain.ProjectStep5Chart">
+		select ipt1, ipt2, ipt3 from tb_project_charts where id = #{id}
+	</select>
+	
+	<update id="updateProjectStep5">
+		update tb_projects set ipt1=#{ipt1}, ipt2=#{ipt2}, ipt3=#{ipt3}, ipt31=#{ipt31}, ipt4=#{ipt4}, ipt5=#{ipt5}, ipt6=#{ipt6}, ipt61=#{ipt61}, ipt7=#{ipt7}, ipt8=#{ipt8}, ipt9=#{ipt9}, ipt10=#{ipt10} where id = #{id}
+	</update>
+	
+	<update id="updateProjectStep5File">
+		update tb_projects set tmp_org_nm=#{orgName}, tmp_sv_nm=#{saveName}, tmp_fnl_nm=#{fnlName} where id = #{id}
+	</update>
+	
+	<update id="updateProjectStep5Chart">
+		update tb_project_charts set ipt1=#{ipt1}, ipt2=#{ipt2}, ipt3=#{ipt3} where id = #{id}
+	</update>
+	
+	<select id="getIptNatList" resultType="String">
+		select nat from tb_${tableName} where stp_dpn='0' and stp_ns1='0' <if test="rcmnd != -1">and stp_rcmnd='${rcmnd}' </if>group by nat order by count(*) desc
+	</select>
+	
+	<select id="getClssInfo" resultType="com.patent.web.chart.Dataset">
+		with tmp as (select clss_id from tb_${tableName} where stp_dpn='0' and stp_ns1='0' <if test="rcmnd != -1">and stp_rcmnd='${rcmnd}' </if>group by clss_id) select cf.id as cnt, cf.code as clmnKey from tmp inner join tb_classification cf on tmp.clss_id = cf.id
+	</select>
+	
+	<select id="getTableName" resultType="String">
+		select table_name from tb_projects where id=#{id}
+	</select>
+	<select id="getPatentYearInfo" resultMap="resultInteger2">
+		with tmp as ( 
+			select nat, EXTRACT(year from dtrl::TIMESTAMP) as dtrl 
+			from tb_${tableName} 
+			where dtrl is not null and dtrl != 'error' and dtrl != '' and stp_dpn='0' and stp_ns1='0' <if test="rcmnd != -1">and stp_rcmnd='${rcmnd}'</if> 
+		)
+		select min(dtrl) as v1, max(dtrl) as v2 from tmp
+	</select>
+	<select id="getPatentYearInfoByClssId" resultMap="resultInteger2">
+		with tmp as ( 
+			select nat, EXTRACT(year from dtrl::TIMESTAMP) as dtrl 
+			from tb_${tableName} 
+			where dtrl is not null and dtrl != 'error' and dtrl != '' and stp_dpn='0' and stp_ns1='0' <if test="rcmnd != -1">and stp_rcmnd='${rcmnd}' </if>and clss_id=#{clssId}
+		)
+		select min(dtrl) as v1, max(dtrl) as v2 from tmp
+	</select>
+	<select id="getPatentYearInfoByNation" resultMap="resultInteger2">
+		with tmp as ( 
+			select nat, EXTRACT(year from dtrl::TIMESTAMP) as dtrl 
+			from tb_${tableName} 
+			where dtrl is not null and dtrl != 'error' and dtrl != '' and stp_dpn='0' and stp_ns1='0' <if test="rcmnd != -1">and stp_rcmnd='${rcmnd}' </if>and nat = #{nat}
+		)
+		select min(dtrl) as v1, max(dtrl) as v2 from tmp
+	</select>
+	
+	<select id="getIpt11" resultType="com.patent.web.chart.Dataset">
+		with tmp as ( 
+			select nat, EXTRACT(year from dtrl::TIMESTAMP) as dtrl 
+			from tb_${tableName} 
+			where dtrl is not null and dtrl != 'error' and dtrl != '' and stp_dpn='0' and stp_ns1='0' <if test="rcmnd != -1">and stp_rcmnd='${rcmnd}'</if> 
+		)
+		select nat as clmnKey, dtrl::varchar as rwKey, count(*) as cnt from tmp 
+		group by nat, dtrl order by dtrl asc, nat asc
+	</select>
+	
+	<select id="getIpt12" resultType="com.patent.web.chart.Dataset">
+		select nat as clmnKey, count(*) as cnt 
+		from tb_${tableName} 
+		where dtrl is not null and dtrl != 'error' and dtrl != '' and stp_dpn='0' and stp_ns1='0' <if test="rcmnd != -1">and stp_rcmnd='${rcmnd}'</if>
+		group by nat order by nat asc
+	</select>
+	
+	<select id="getIpt13NatList" resultType="String">
+		select nat 
+		from tb_${tableName} 
+		where dtrl is not null and dtrl != 'error' and dtrl != '' and stp_dpn='0' and stp_ns1='0' <if test="rcmnd != -1">and stp_rcmnd='${rcmnd}'</if>
+		group by nat
+	</select>
+	
+	<select id="getIpt13" resultType="com.patent.web.chart.Dataset">
+		with tmp as (
+			select nat, EXTRACT(year from dtrl::TIMESTAMP) as dtrl 
+			from tb_${tableName} 
+			where dtrl is not null and dtrl != 'error' and dtrl != '' and nat = #{nat} and stp_dpn='0' and stp_ns1='0' <if test="rcmnd != -1">and stp_rcmnd='${rcmnd}'</if>
+		), grp as (
+			select dtrl, count(*) as cnt from tmp group by dtrl order by dtrl asc
+		)
+		select dtrl::varchar as clmnKey, cnt, coalesce(cnt - lag(cnt) over (order by dtrl asc), 0) as cnt2 from grp
+	</select>
+	
+	<select id="getIpt21" resultType="com.patent.web.chart.Dataset">
+		with tmp as ( 
+			select nat, sum(coalesce(aplctnm, 1)) as aplctnm 
+			from tb_${tableName} 
+			where stp_dpn='0' and stp_ns1='0' <if test="rcmnd != -1">and stp_rcmnd='${rcmnd}'</if>
+			group by nat 
+		)
+		select nat as clmnKey, aplctnm as cnt from tmp
+	</select>
+	
+	<select id="getIpt22" resultType="com.patent.web.chart.Dataset">
+		with tmp as ( 
+			<choose>
+    			<when test="nat == 'EP'">
+    				select t.nat, case when ec.nat is not null then 'EP' else t.aplctnat end as aplctnat
+					from (
+						select nat, upper(trim(unnest(string_to_array(aplctnat, '|')))) as aplctnat 
+						from tb_${tableName} 
+						where stp_dpn='0' and stp_ns1='0' <if test="rcmnd != -1">and stp_rcmnd='${rcmnd}' </if>and aplctnat is not null and aplctnat != '' and nat = 'EP'
+					) t
+					left outer join tb_eu_code ec
+					on t.aplctnat = ec.nat 
+    			</when>
+    			<otherwise>
+    				select nat, upper(trim(unnest(string_to_array(aplctnat, '|')))) as aplctnat 
+					from tb_${tableName} 
+					where stp_dpn='0' and stp_ns1='0' <if test="rcmnd != -1">and stp_rcmnd='${rcmnd}'</if>and aplctnat is not null and aplctnat != '' and nat = #{nat}
+    			</otherwise>
+    		</choose>
+		), dt as (
+			select count(aplctnat) as al,
+			COALESCE(sum(CASE WHEN nat=aplctnat THEN 1 ELSE 0 END),0) as cnt
+			from tmp
+		)
+		select cnt, al - cnt as cnt2 from dt
+	</select>	
+	
+	<select id="getIpt23" resultType="com.patent.web.chart.Dataset">
+		with nat as (select nat  from tb_${tableName} group by nat)
+		, tmp as ( 
+			<choose>
+    			<when test="nat == 'EP'">
+    				select t.nat, case when ec.nat is not null then 'EP' else t.aplctnat end as aplctnat
+					from (
+						select nat, upper(trim(unnest(string_to_array(aplctnat, '|')))) as aplctnat 
+						from tb_${tableName} 
+						where stp_dpn='0' and stp_ns1='0' <if test="rcmnd != -1">and stp_rcmnd='${rcmnd}' </if>and aplctnat is not null and aplctnat != '' and nat = 'EP'
+					) t
+					left outer join tb_eu_code ec
+					on t.aplctnat = ec.nat 
+    			</when>
+    			<otherwise>
+    				select nat, upper(trim(unnest(string_to_array(aplctnat, '|')))) as aplctnat 
+					from tb_${tableName} 
+					where stp_dpn='0' and stp_ns1='0' <if test="rcmnd != -1">and stp_rcmnd='${rcmnd}' </if>and aplctnat is not null and aplctnat != '' and nat = #{nat}
+    			</otherwise>
+    		</choose>
+		)
+		select aplctnat as clmnKey, count(aplctnat) as cnt 
+		from tmp 
+		inner join nat
+		on tmp.aplctnat = nat.nat and tmp.aplctnat != #{nat} 
+		group by aplctnat
+	</select>
+	
+	<select id="getIpt24" resultType="com.patent.web.chart.Dataset">
+		with nat as (select nat  from tb_${tableName} group by nat)
+		, tmp as ( 
+			<choose>
+    			<when test="nat == 'EP'">
+    				select t.nat, case when ec.nat is not null then 'EP' else t.aplctnat end as aplctnat, dtrl
+					from (
+						select nat, upper(trim(unnest(string_to_array(aplctnat, '|')))) as aplctnat, EXTRACT(year from dtrl::TIMESTAMP) as dtrl  
+						from tb_${tableName} 
+						where stp_dpn='0' and stp_ns1='0' <if test="rcmnd != -1">and stp_rcmnd='${rcmnd}' </if>and aplctnat is not null and aplctnat != '' and nat = 'EP' and dtrl != '' and dtrl != 'error' and dtrl is not null
+					) t
+					left outer join tb_eu_code ec
+					on t.aplctnat = ec.nat 
+    			</when>
+    			<otherwise>
+    				select nat, upper(trim(unnest(string_to_array(aplctnat, '|')))) as aplctnat, EXTRACT(year from dtrl::TIMESTAMP) as dtrl 
+					from tb_${tableName} 
+					where stp_dpn='0' and stp_ns1='0' <if test="rcmnd != -1">and stp_rcmnd='${rcmnd}' </if>and aplctnat is not null and aplctnat != '' and nat = #{nat} and dtrl != '' and dtrl != 'error' and dtrl is not null
+    			</otherwise>
+    		</choose>
+		), fnl as (
+			select dtrl, COALESCE(sum(CASE WHEN nat!=aplctnat THEN 1 ELSE 0 END),0) as cnt, COALESCE(sum(CASE WHEN nat=aplctnat THEN 1 ELSE 0 END),0) as cnt3 
+			from tmp 
+			group by dtrl 
+			order by dtrl asc
+		)
+		select dtrl::varchar as clmnKey, cnt, coalesce(cnt - lag(cnt) over (order by dtrl asc), 0) as cnt2, cnt3, coalesce(cnt3 - lag(cnt3) over (order by dtrl asc), 0) as cnt4
+		from fnl
+		order by dtrl asc
+	</select>
+	<select id="getIpt31" resultType="com.patent.web.chart.Dataset">
+		with tmp as (
+			select id, upper(trim(unnest(string_to_array(aplct, '|')))) as aplct 
+			from tb_${tableName} 
+			where stp_dpn='0' and stp_ns1='0' <if test="rcmnd != -1">and stp_rcmnd='${rcmnd}' </if>and aplct is not null and aplct != ''
+					and dtrl != '' and dtrl != 'error' and dtrl is not null 
+					and EXTRACT(year from dtrl::timestamp) >= #{st}::float
+					and EXTRACT(year from dtrl::timestamp) <![CDATA[<=]]> #{fh}::float
+		), cnt2 as (
+			select aplct from tmp where aplct is not null and aplct != '' group by aplct
+		), cnt as (
+			select id from tmp where aplct is not null and aplct != '' group by id
+		)
+		select (select count(*) from cnt) as cnt, (select count(*) from cnt2) as cnt2
+	</select>
+	
+	<select id="getIpt32" resultType="com.patent.web.chart.Dataset">
+		with tmp as (
+			select id, upper(trim(unnest(string_to_array(aplct, '|')))) as aplct 
+			from tb_${tableName} 
+			where stp_dpn='0' and stp_ns1='0' <if test="rcmnd != -1">and stp_rcmnd='${rcmnd}' </if>and aplct != '' and aplct is not null 
+				and nat = #{nat} 
+				and dtrl != '' and dtrl != 'error' and dtrl is not null
+				and EXTRACT(year from dtrl::timestamp) >= #{st}::float
+				and EXTRACT(year from dtrl::timestamp) <![CDATA[<=]]> #{fh}::float
+		), cnt2 as (
+			select aplct from tmp where aplct is not null and aplct != '' group by aplct
+		), cnt as (
+			select id from tmp where aplct is not null and aplct != '' group by id
+		)
+		select (select count(*) from cnt) as cnt, (select count(*) from cnt2) as cnt2
+	</select>
+	
+	<select id="getIpt41" resultType="com.patent.web.chart.Dataset">
+		with tmp as (
+			select clss_id, count(id) as cnt 
+			from tb_${tableName} 
+			where stp_dpn='0' and stp_ns1='0' <if test="rcmnd != -1">and stp_rcmnd='${rcmnd}' </if><if test="nat != null"> and nat = #{nat} </if> 
+			group by clss_id
+		)
+		select cf.code as clmnKey, tmp.cnt 
+		from tmp 
+		inner join tb_classification cf 
+		on tmp.clss_id = cf.id
+	</select>
+	
+	<select id="getIpt51" resultType="com.patent.web.chart.Dataset">
+		with tmp as (
+			select clss_id, extract(year from dtrl::timestamp) as dtrl 
+			from tb_${tableName} 
+			where stp_dpn='0' and stp_ns1='0' <if test="rcmnd != -1">and stp_rcmnd='${rcmnd}' </if>and dtrl != '' and dtrl != 'error' and dtrl is not null
+		), 
+		dt as (
+			select dtrl, clss_id, count(clss_id) as cnt 
+			from tmp 
+			group by dtrl, clss_id 
+			order by dtrl asc
+		)
+		select dt.dtrl as rwKey, cf.code as clmnKey, dt.cnt 
+		from dt 
+		inner join tb_classification cf 
+		on dt.clss_id = cf.id
+	</select>
+	
+	<select id="getIpt51ClssInfo" resultType="com.patent.web.chart.Dataset">
+		with tmp as (
+			select clss_id, nat 
+			from tb_${tableName} 
+			where stp_dpn='0' and stp_ns1='0' <if test="rcmnd != -1">and stp_rcmnd='${rcmnd}'</if>
+			group by clss_id, nat
+		) 
+		select cf.id as cnt, cf.code as clmnKey, tmp.nat as rwKey 
+		from tmp 
+		inner join tb_classification cf 
+		on tmp.clss_id = cf.id
+	</select>
+	<select id="getIpt52" resultType="com.patent.web.chart.Dataset">
+		with tmp as (
+			select nat, extract(year from dtrl::timestamp) as dtrl 
+			from tb_${tableName} 
+			where stp_dpn='0' and stp_ns1='0' <if test="rcmnd != -1">and stp_rcmnd='${rcmnd}' </if>and dtrl != '' and dtrl != 'error' and dtrl is not null and clss_id = #{clssId} and nat = #{nat}
+		), nat as (
+			select nat from tb_${tableName} group by nat
+		), dt as (
+			select dtrl, nat, count(nat) as cnt 
+			from tmp 
+			where nat in (select nat from nat) 
+			group by dtrl, nat 
+			order by dtrl asc
+		)
+		select dt.dtrl::varchar as clmnKey, dt.nat as rwKey, dt.cnt, coalesce(dt.cnt - lag(dt.cnt) over (order by dt.dtrl asc), 0) as cnt2
+		from dt
+	</select>
+	
+	<select id="getIpt61" resultType="com.patent.web.chart.Dataset">
+		with tmp as (
+			select clss_id, extract(year from dtrl::timestamp) as dtrl 
+			from tb_${tableName} 
+			where stp_dpn='0' and stp_ns1='0' <if test="rcmnd != -1">and stp_rcmnd='${rcmnd}' </if>
+				and dtrl != '' and dtrl != 'error' and dtrl is not null
+				and extract(year from dtrl::timestamp) >= #{st}::float
+				and extract(year from dtrl::timestamp) <![CDATA[<=]]> #{fh}::float 
+		),  dt as (
+			select clss_id, count(clss_id) as cnt 
+			from tmp 
+			group by clss_id
+		)
+		select cf.code as clmnKey, cnt 
+		from dt 
+		inner join tb_classification cf 
+		on dt.clss_id = cf.id
+	</select>
+	
+	<select id="getIpt62" resultType="com.patent.web.chart.Dataset">
+		with tmp as (
+			select clss_id, count(*) as cnt 
+			from tb_${tableName} 
+			where stp_dpn='0' and stp_ns1='0' <if test="rcmnd != -1">and stp_rcmnd='${rcmnd}' </if>
+				and dtrl != '' and dtrl != 'error' and dtrl is not null
+				and extract(year from dtrl::timestamp) >= #{st}::float
+				and extract(year from dtrl::timestamp) <![CDATA[<=]]> #{fh}::float  
+			group by clss_id
+		),  tt as (
+			select sum(cnt) as cnt from tmp
+		)
+		select cf.code as clmnKey, round(cnt/(select cnt from tt)*100, 2)::float as cnt 
+		from tmp 
+		inner join tb_classification cf 
+		on tmp.clss_id = cf.id
+	</select>
+	<select id="getIpt71" resultType="com.patent.web.chart.Dataset">
+		select nat as clmnKey, count(nat) as cnt 
+		from tb_${tableName} 
+		where stp_dpn='0' and stp_ns1='0' <if test="rcmnd != -1">and stp_rcmnd='${rcmnd}' </if>and clss_id = #{clssId} 
+		group by nat
+	</select>
+	
+	
+<!-- 출원인/국가 배열 갯수가 같으면 같은 인덱스의 위치의 국가로 나옴.  -->
+<!-- 출원인/출원인 국가 중 하나라도 없으면 검색 안됨. -->
+	<select id="getIpt81" resultType="com.patent.web.chart.Tableset">
+		with tmp as (
+			select upper(trim(unnest(string_to_array(aplct, '|')))) as aplct, nat, clss_id, upper(trim(unnest(string_to_array(aplctnat, '|')))) as aplctnat 
+			from tb_${tableName} 
+			where aplct != '' and aplct is not null and aplctnat != '' and aplctnat is not null and stp_dpn='0' and stp_ns1='0' <if test="rcmnd != -1">and stp_rcmnd='${rcmnd}'</if>
+		) 
+		select	dt.aplct, 
+				dt.aplctnat,
+				count(*) as cnt 
+				${param}, 
+				(
+					select cf.code 
+					from 
+					(
+						select clss_id 
+						from tmp 
+						where dt.aplct=tmp.aplct and dt.aplctnat=tmp.aplctnat
+						group by clss_id 
+						order by count(*) desc 
+						limit 1
+					) tmpdt 
+					inner join tb_classification cf 
+					on tmpdt.clss_id = cf.id 
+				) as clss
+		from tmp dt
+		where aplct != '' and aplct is not null and aplctnat != '' and aplctnat is not null
+		group by aplct, aplctnat
+		order by cnt desc
+		limit #{cnt}
+	</select>
+	
+	<select id="getIpt91" resultType="com.patent.web.chart.Dataset">
+		with tmp as (
+			select upper(trim(unnest(string_to_array(aplct, '|')))) as aplct 
+			from tb_${tableName} 
+			where aplct != '' and aplct is not null and stp_dpn='0' and stp_ns1='0' <if test="rcmnd != -1">and stp_rcmnd='${rcmnd}' </if>
+		)
+		select aplct as rwKey, 'ipt' as clmnKey, count(*) as cnt 
+		from tmp 
+		where aplct is not null and aplct != '' 
+		group by aplct 
+		order by cnt desc 
+		limit #{count}
+	</select>
+	
+	<select id="getIpt92" resultType="com.patent.web.chart.Dataset">
+		with tmp as (
+			select id, upper(trim(unnest(string_to_array(aplct, '|')))) as aplct, concat(nat, ' | ', epoappnm) as epoappnm
+			from tb_${tableName} 
+			where aplct != '' and aplct is not null and stp_dpn='0' and stp_ns1='0' <if test="rcmnd != -1">and stp_rcmnd='${rcmnd}' </if>
+		), tmp_dt as (
+			select id, aplct, unnest(REGEXP_MATCHES(upper(trim(unnest(string_to_array(epoappnm, '|')))), '[a-zA-Z]*')) as epoappnm
+			from tmp
+			where aplct != '' and aplct is not null and epoappnm != '' and epoappnm is not null
+		), chk1 as (
+			select id, aplct, epoappnm
+			from tmp_dt
+			where epoappnm != '' and epoappnm is not null 
+			group by id, aplct, epoappnm
+		), chk2 as (
+			select id, aplct, array_agg(epoappnm) as epoappnm
+			from chk1
+			group by id, aplct
+		), dt as (
+			select id, aplct,
+				case when (
+						case when epoappnm @> array['US'] then 1 else 0 end +
+						case when epoappnm @> array['EP'] then 1 else 0 end +
+						case when epoappnm @> array['JP'] then 1 else 0 end
+				) >= 3 then 1 else 0 end as third
+			from chk2
+		)
+		select aplct as rwKey, COALESCE(sum(CASE WHEN third=1 THEN 1 ELSE 0 END),0) as cnt, 
+			COALESCE(sum(CASE WHEN third=0 THEN 1 ELSE 0 END),0) as cnt2 
+		from dt 
+		group by aplct 
+		order by count(id) desc 
+		limit #{count}
+	</select>
+	
+	<select id="getIpt101" resultType="com.patent.web.chart.Dataset">
+		with tmp as (
+			select upper(trim(unnest(string_to_array(aplct, '|')))) as aplct 
+			from tb_${tableName} 
+			where nat = #{nat} and aplct != '' and aplct is not null and stp_dpn='0' and stp_ns1='0' <if test="rcmnd != -1">and stp_rcmnd='${rcmnd}' </if>
+		)
+		select 'ipt' as clmnKey, aplct as rwKey, count(*) as cnt 
+		from tmp 
+		where aplct != '' and aplct is not null 
+		group by aplct 
+		order by count(aplct) desc 
+		limit #{count}
+	</select>
+	
+	<select id="getIpt102" resultType="com.patent.web.chart.Dataset">
+		with tmp as (
+			select upper(trim(unnest(string_to_array(aplct, '|')))) as aplct 
+			from tb_${tableName} 
+			where clss_id=#{clssId} and aplct != '' and aplct is not null and stp_dpn='0' and stp_ns1='0' <if test="rcmnd != -1">and stp_rcmnd='${rcmnd}' </if>
+		)
+		select 'ipt' as clmnKey, aplct as rwKey, count(*) as cnt 
+		from tmp 
+		where aplct != '' and aplct is not null 
+		group by aplct 
+		order by count(aplct) desc 
+		limit #{count}
+	</select>
+	
+	<delete id="deleteQtdProject">
+		update tb_projects set is_qtd=0 where id=#{id}
+	</delete>
+	<delete id="deleteNextPatent">
+		delete from tb_${tableName} where stp_fml='1' or stp_qtd='1'
+	</delete>
+</mapper>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+
+<!--/////////////////////////////////////////////////////////////////////////////
+//
+//(c)2003-2018 ITS-I Inc. All Rights Reserved.
+//
+//THIS SOURCE FILE IS THE PROPERTY OF ITS-I Inc. AND IS NOT TO BE
+//RE-DISTRIBUTED BY ANY MEANS WHATSOEVER WITHOUT THE EXPRESSED
+//WRITTEN CONSENT OF ITS-I Inc.
+//
+//CONTACT INFORMATION:
+//support@its-i.co.kr
+//http://www.its-i.co.kr
+//
+/////////////////////////////////////////////////////////////////////////////-->
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+</head>
+
+<style layout:fragment="pageStyle" type="text/css">
+.filebox label { display: inline-block; padding: .5em .75em; color: #999; font-size: inherit; line-height: normal; vertical-align: middle; background-color: #fdfdfd; cursor: pointer; border: 1px solid #ebebeb; border-bottom-color: #e2e2e2; border-radius: .25em; } .filebox input[type="file"] { /* 파일 필드 숨기기 */ position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip:rect(0,0,0,0); border: 0; }
+
+.modal-body {
+	padding: 0px;
+}
+
+.onoffswitch-inner:before {
+	content: "노이즈";
+}
+.onoffswitch-inner:after {
+	content: "노이즈 아님.";
+}
+.onoffswitch {
+	width: 120px;
+}
+.onoffswitch-switch {
+	right: 102px;
+}
+</style>
+
+<body>
+	<div class="row" layout:fragment="mainContent">
+		<div class="ibox float-e-margins">
+			<div class="ibox-content">
+				<div id="wizard" role="application" class="wizard clearfix">
+					<div class="steps clearfix" th:include="fragments/project :: menu"></div>
+					
+					<div class="row">
+						<div class="col-lg-12">
+							<form id="project_step2" name="project_step2" method="post" class="form-horizontal">
+								<div class="float-e-margins">
+									<div class="ibox-title">
+										<h5>노이즈 필터링 설정</h5>
+										<div class="ibox-tools">
+											<button type="button" class="btn btn-primary" id="btnForm2Save">노이즈 필터링</button>
+											<button type="button" class="btn btn-info" id="btnForm2Next">다음</button>
+										</div>
+									</div>
+								</div>
+								<div class="ibox-content project_form_content">
+									<div class="form-group">
+										<div class="col-sm-12">
+											<input type="hidden" name="id" th:field="${projectinfo.id}">
+											[노이즈 필터링]을 클릭하여 노이즈 특허를 제거 하시거나 [다음]을 클릭하여 무결성 검증 단계로 이동 할 수 있습니다.
+										</div>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+					
+					<div id="noisePatent"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	
+
+	<script layout:fragment="pageScript" th:inline="javascript">
+		var defaultStatus = /*[[${projectinfo.status}]]*/
+		var isNs = /*[[${projectinfo.isNs}]]*/
+		
+		$(document).ready(function() {
+			eventSpinner();
+			
+			if ( defaultStatus > 3) {
+				loadNoisePatent();
+			}
+
+			$("#btnForm2Next").click(function() {
+				var data = new FormData();
+				data.append("id", /*[[${projectId}]]*/);
+				patentFormDataSubmit(/*[[@{'/project/step2/finish'}]]*/, data,
+					function (res) {
+						patentMovePage(/*[[@{/project/step3}]]*/, 0, 0, {"id":/*[[${projectId}]]*/});
+					},
+					function () {
+						sweetalert("저장에 실패했습니다.", "error");
+					}
+				);
+			});
+			$("#btnForm2Save").click(function() {
+				var message = swalMessage(isNs, 0);
+				sweetsubmit({text:message}, function() {
+					loadSpinner();
+					patentFormSubmit(/*[[@{'/project/updateStep2'}]]*/, $("#project_step2").serialize(), 
+						function (res) {
+							sweetalert("저장에 성공했습니다.", "success", function() {
+								closedSpinner();
+								loadNoisePatent();
+								isNs = 1;
+							});
+						},
+						function (res) {
+							setTimeout(function() {failureMessage(res.message);}, 500);
+						}
+					);
+				});
+			});
+		});
+		
+		function failureMessage(mess) {
+			sweetalert("저장에 실패했습니다.[" + mess + "]", "error", function() {
+				closedSpinner();
+			});
+		}
+		function loadNoisePatent() {
+			loadSubPage("noisePatent", /*[[@{'/project/step2/getNoiseInfo'}]]*/, {id:/*[[${projectId}]]*/}, function() {
+				loadList(0);
+			});
+		}
+		
+		function loadList(page) {
+			loadListPage("finalNoisePatentList", /*[[@{'/project/step2/getFinalNoise'}]]*/, {id:/*[[${projectId}]]*/,page:page,limit:$("#searchLimit").val(),search:$("#searchVal").val()}, initTable);	
+		}
+
+		function downExcelAction() {
+			downExcel(/*[[@{'/project/downloadExcel/'} + ${projectId} + '/2']]*/, $("#searchVal").val());
+		}
+	</script>
+
+</body>
+</html>

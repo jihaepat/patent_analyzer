@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+
+<!--/////////////////////////////////////////////////////////////////////////////
+//
+//(c)2003-2018 ITS-I Inc. All Rights Reserved.
+//
+//THIS SOURCE FILE IS THE PROPERTY OF ITS-I Inc. AND IS NOT TO BE
+//RE-DISTRIBUTED BY ANY MEANS WHATSOEVER WITHOUT THE EXPRESSED
+//WRITTEN CONSENT OF ITS-I Inc.
+//
+//CONTACT INFORMATION:
+//support@its-i.co.kr
+//http://www.its-i.co.kr
+//
+/////////////////////////////////////////////////////////////////////////////-->
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+</head>
+
+
+<style layout:fragment="pageStyle" type="text/css">
+.middle-box {
+	max-width: 1900px !important;
+}
+
+.wrapper .middle-box {
+	margin-top: 10px !important;
+}
+
+.loginscreen.middle-box {
+	width: 760px !important;
+}
+</style>
+<body>
+
+	<div class="row" layout:fragment="mainContent">
+		
+		<form role="form" id="form">
+			<div class="ibox float-e-margins">
+				<div class="ibox-title">
+					<h5>회원 가입 </h5>
+				</div>
+				<div class="ibox-content">
+					<input type="hidden" name="adv" th:value="${adv}" />
+					<div class="form-group">
+						<label>아이디 *</label> <label id="usrid-error" class="error" for="usrid"></label>
+						<input id="usrid" name="usrid" type="text" placeholder="아이디를 입력하십시요." class="form-control" />
+					</div>
+					<div class="form-group">
+						<label>비밀번호 *</label> <label id="usrpass-error" class="error" for="usrpass"></label>
+						<input id="usrpass" name="usrpass" type="password" placeholder="비밀번호를 입력하십시요." class="form-control" />
+					</div>
+					<div class="form-group">
+						<label>비밀번호 확인 *</label> <label id="confirm_pass-error" class="error" for="confirm_pass"></label>
+						<input id="confirm_pass" name="confirm_pass" type="password" placeholder="비밀번호 확인을 입력하십시요." class="form-control" />
+					</div>
+					<div class="hr-line-dashed"></div>
+					<div class="form-group">
+						<label>이름 *</label> <label id="name-error" class="error" for="name"></label>
+						<input id="name" name="name" type="text" placeholder="이름을 입력하십시요." class="form-control" />
+					</div>
+					<div class="form-group">
+						<label>소속</label> <label id="position-error" class="error" for="position"></label>
+						<input id="position" name="position" type="text" placeholder="소속을 입력하십시요." class="form-control" />
+					</div>
+					<div class="form-group">
+						<label>이메일 *</label> <label id="mailaddr-error" class="error" for="mailaddr"></label>
+						<input id="mailaddr" name="mailaddr" type="email" placeholder="이메일을 입력하십시요. (abc@gmail.com))" class="form-control" />
+					</div>
+					<div class="form-group">
+						<label>연락처</label> <label id="phone-error" class="error" for="phone"></label>
+						<input id="phone" name="phone" type="text" placeholder="연라처를 입력하십시요. (010-0000-0000)" class="form-control" />
+					</div>
+					<div class="hr-line-dashed"></div>
+                    
+
+					<div class="form-group">
+		                <p>
+                            <button id="cancel" type="button" class="btn btn-w-m btn-success half-width">취 소</button>
+                            <button type="submit" class="btn btn-w-m btn-primary half-width btn_right">가 입</button>
+                        </p>
+	                </div>
+				</div>
+			</div>
+		</form>
+	</div>
+
+
+
+	<script layout:fragment="pageScript" th:inline="javascript">
+		$(document).ready(function() {
+			$("#cancel").click(function() {
+				patentMovePage(/*[[@{'/login'}]]*/);
+			});	
+			
+			$("#form").validate({
+				onkeyup: function(element, event, force) {
+					clearTimeout(this.delayer);
+
+					var context = this;
+					this.delayer = setTimeout(function () {
+						$(element).focusout();
+					}, 500);
+				},
+				rules : {
+					usrid: {
+						required: true,
+						minlength: 5,
+						maxlength: 15,
+						remote: {
+							url: /*[[@{'/check_id'}]]*/,
+							type: "POST",
+							cache: false,
+							dataType: "json",
+							dataFilter: function (response) {
+								if (response) {
+									var obj = JSON.parse(response);
+									if (obj.result) {
+										return "true";
+									}
+								}
+								
+								return "false";
+							}
+						}
+					},
+					usrpass: {
+						required: true,
+						minlength: 5,
+						maxlength: 15
+					},
+					confirm_pass: {
+						required: true,
+						equalTo: "#usrpass"
+					},
+					name: {
+						required: true,
+						minlength: 2,
+						maxlength: 15
+					},
+					position: {
+						required: false,
+						minlength: 2,
+						maxlength: 15
+					},
+					mailaddr: {
+						required: true,
+						email: true
+					},
+					phone: {
+						required: false,
+						phone: true
+					}
+				}, messages: {
+					usrid: {
+						required: "아이디를 입력하세요.",
+						remote : "해당 아이디는 중복되었습니다.",
+						minlength: $.validator.format("아이디는 최소 {0} 글자 이상 입력하세요."),
+						maxlength: $.validator.format("아이디는 최대 {0} 글자까지 입력하세요.")
+					},
+					usrpass: {
+						required: "비밀번호를 입력하세요.",
+						minlength: $.validator.format("비밀번호는 최소 {0} 글자 이상 입력하세요."),
+						maxlength: $.validator.format("비밀번호는 최대 {0} 글자까지 입력하세요.")
+					},
+					confirm_pass: {
+						required: "비밀번호확인을 입력하세요.",
+						equalTo: "비밀번호가 일치하지 않습니다."
+					},
+					name: {
+						required: "이름을 입력하세요.",
+						minlength: $.validator.format("이름은 최소 {0} 글자 이상 입력하세요."),
+						maxlength: $.validator.format("이름은 최대 {0} 글자까지 입력하세요.")
+					},
+					position: {
+						minlength: $.validator.format("소속은 최소 {0} 글자 이상 입력하세요."),
+						maxlength: $.validator.format("소속은 최대 {0} 글자까지 입력하세요.")
+					},
+					mailaddr: {
+						required: "이메일을 입력하세요.",
+						email: "이메일을 정확하게 입력하십시요."
+					}
+				}, submitHandler: function(form) {
+					patentFormSubmit(/*[[@{'/insertMember'}]]*/, $(form).serialize(), 
+						function () {
+							sweetalert("등록이 되었습니다. 관리자 승인까지 대기하십시오.", null, function() {
+	        					patentMovePage(/*[[@{'/sub'}]]*/);
+		        			});
+						},
+						function () {
+							$("#form").validate().showErrors({"usrid": "등록에 실패했습니다."});
+						}
+					);
+				}
+			});
+		});
+	</script>
+</body>
+</html>

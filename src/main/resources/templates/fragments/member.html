@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+
+<!--/////////////////////////////////////////////////////////////////////////////
+//
+//(c)2003-2017 ITS-I Inc. All Rights Reserved.
+//
+//THIS SOURCE FILE IS THE PROPERTY OF ITS-I Inc. AND IS NOT TO BE
+//RE-DISTRIBUTED BY ANY MEANS WHATSOEVER WITHOUT THE EXPRESSED
+//WRITTEN CONSENT OF ITS-I Inc.
+//
+//CONTACT INFORMATION:
+//support@its-i.co.kr
+//http://www.its-i.co.kr
+//
+/////////////////////////////////////////////////////////////////////////////-->
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+<body>
+	<div th:fragment="list">
+		<div class="table-responsive">
+			<div class="dataTables_wrapper form-inline dt-bootstrap">
+				<table id="dataList" class="table table-striped table-bordered table-hover dataTables-example dataTable">
+					<thead>
+						<tr>
+				      		<th></th>
+							<th>아이디</th>
+							<th>가입일</th>
+							<th>전화번호</th>
+							<th>이메일</th>
+							<th>사용자 구분</th>
+						</tr>
+					</thead>
+						<tr th:each="data : ${list}" th:onclick="'javascript:viewAccountPop(\''+${data.id}+'\');'">
+							<td th:text="${data.rownum}"></td>
+							<td th:text="${data.usrid}"></td>
+							<td th:text="${data.regdt}"></td>
+							<td th:text="${data.phone}"></td>
+							<td th:text="${data.mailaddr}"></td>
+							<td th:switch="${data.grade}">
+								<span th:case="'0'">가입신청자</span>
+								<span th:case="'1'">일반사용자</span>
+								<span th:case="'2'">특허전문가</span>
+								<span th:case="'10'">관리자</span>
+								<span th:case="*" th:text="${data.grade}"></span>
+							</td>
+						</tr>
+					<tbody>
+					</tbody>
+				</table>
+				
+				<div th:include="fragments/pageable :: pageable"></div>
+			</div>
+		</div>
+	</div>
+	
+	<div th:fragment="memberForm">
+		<div class="modal inmodal fade" id="accountModal" tabindex="-1" role="dialog" aria-hidden="true">
+	        <div class="modal-dialog modal-lg">
+	            <div class="modal-content">
+	                <div class="modal-header">
+	                    <button type="button" class="close" data-dismiss="modal">
+	                        <span aria-hidden="true">&times;</span>
+	                        <span class="sr-only">Close</span>
+	                    </button>
+	                    <h4 class="modal-title" id="title">사용자 계정 상세</h4>
+	                </div>
+	                
+	                <form id="memberForm" role="form" th:action="@{/member/update}" method="POST" class="form-horizontal">
+	                	<div class="modal-body">
+	                		<div class="form-group">
+							<label class="col-sm-2 control-label">ID*</label>
+							<div class="col-sm-10">
+								<input type="hidden" id="id" name="id" th:field="${info.id}"/>
+								<input type="text" class="form-control" id="usrid" name="usrid" readonly="readonly" th:field="${info.usrid}"/>
+								<label id="usrid-error" class="error form_error" for="usrid"></label>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-2 control-label">비밀번호*</label>
+							<div class="col-sm-10">
+								<input type="password" class="form-control" id="usrpass" name="usrpass"/>
+								<label id="usrpass-error" class="error form_error" for="usrpass"></label>	
+							</div>
+						</div>
+				            		<div class="form-group">
+							<label class="col-sm-2 control-label">비밀번호 확인*</label>
+							<div class="col-sm-10">
+								<input type="password" class="form-control" id="confirm" name="confirm"/>
+								<label id="confirm-error" class="error form_error" for="confirm"></label>	
+							</div>
+						</div>
+						
+						<div class="hr-line-dashed"></div>
+				            		<div class="form-group">
+							<label class="col-sm-2 control-label">이름*</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" id="name" name="name" th:field="${info.name}"/>
+								<label id="name-error" class="error form_error" for="name"></label>	
+							</div>
+						</div>
+				            		<div class="form-group">
+							<label class="col-sm-2 control-label">소속</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" id="position" name="position" th:field="${info.position}"/>
+								<label id="position-error" class="error form_error" for="position"></label>	
+							</div>
+						</div>
+				            		<div class="form-group">
+							<label class="col-sm-2 control-label">이메일*</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" id="mailaddr" name="mailaddr" th:field="${info.mailaddr}"/>
+								<label id="mailaddr-error" class="error form_error" for="mailaddr"></label>	
+							</div>
+						</div>
+				            		<div class="form-group">
+							<label class="col-sm-2 control-label">연락처</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" id="phone" name="phone" th:field="${info.phone}"/>
+								<label id="phone-error" class="error form_error" for="phone"></label>	
+							</div>
+						</div>
+						
+						<div class="hr-line-dashed"></div>
+				            		<div class="form-group">
+							<label class="col-sm-2 control-label">계정등급</label>
+							<div class="col-sm-10">
+								<select id="grade" name="grade" class="form-control" th:field="${info.grade}" disabled="disabled"  >
+									<option value="0">가입신청자</option>
+									<option value="1">일반사용자</option>
+									<option value="2">특허전문가</option>
+									<option value="10">관리자</option>
+								</select>
+							</div>
+						</div>
+		                </div>
+		                
+	                    <div class="modal-footer">
+	                        <button type="button" class="btn btn-primary" data-dismiss="modal">닫기</button>
+	                        <button type="submit" class="btn btn-primary">저장</button>
+	                    </div>
+	                   </form>
+	            </div>
+	        </div>
+	    </div>
+	</div>
+	
+	<div th:fragment="memberForm1">
+		<div class="form-group">
+			<label class="col-sm-2 control-label">ID*</label>
+			<div class="col-sm-10">
+				<input type="hidden" id="id" name="id" th:field="${info.id}"/>
+				<input type="text" class="form-control" id="usrid" name="usrid" readonly="readonly" th:field="${info.usrid}"/>
+				<label id="usrid-error" class="error form_error" for="usrid"></label>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label">비밀번호*</label>
+			<div class="col-sm-10">
+				<input type="password" class="form-control" id="usrpass" name="usrpass"/>
+				<label id="usrpass-error" class="error form_error" for="usrpass"></label>	
+			</div>
+		</div>
+            		<div class="form-group">
+			<label class="col-sm-2 control-label">비밀번호 확인*</label>
+			<div class="col-sm-10">
+				<input type="password" class="form-control" id="confirm" name="confirm"/>
+				<label id="confirm-error" class="error form_error" for="confirm"></label>	
+			</div>
+		</div>
+		
+		<div class="hr-line-dashed"></div>
+            		<div class="form-group">
+			<label class="col-sm-2 control-label">이름*</label>
+			<div class="col-sm-10">
+				<input type="text" class="form-control" id="name" name="name" th:field="${info.name}"/>
+				<label id="name-error" class="error form_error" for="name"></label>	
+			</div>
+		</div>
+            		<div class="form-group">
+			<label class="col-sm-2 control-label">소속</label>
+			<div class="col-sm-10">
+				<input type="text" class="form-control" id="position" name="position" th:field="${info.position}"/>
+				<label id="position-error" class="error form_error" for="position"></label>	
+			</div>
+		</div>
+            		<div class="form-group">
+			<label class="col-sm-2 control-label">이메일*</label>
+			<div class="col-sm-10">
+				<input type="text" class="form-control" id="mailaddr" name="mailaddr" th:field="${info.mailaddr}"/>
+				<label id="mailaddr-error" class="error form_error" for="mailaddr"></label>	
+			</div>
+		</div>
+            		<div class="form-group">
+			<label class="col-sm-2 control-label">연락처</label>
+			<div class="col-sm-10">
+				<input type="text" class="form-control" id="phone" name="phone" th:field="${info.phone}"/>
+				<label id="phone-error" class="error form_error" for="phone"></label>	
+			</div>
+		</div>
+		
+		<div class="hr-line-dashed"></div>
+            		<div class="form-group">
+			<label class="col-sm-2 control-label">계정등급</label>
+			<div class="col-sm-10">
+				<select id="grade" name="grade" class="form-control" th:field="${info.grade}" disabled="disabled"  >
+					<option value="0">가입신청자</option>
+					<option value="1">일반사용자</option>
+					<option value="2">특허전문가</option>
+					<option value="10">관리자</option>
+				</select>
+			</div>
+		</div>
+	</div>
+	
+</body>
+</html>
